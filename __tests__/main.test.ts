@@ -1,89 +1,171 @@
 /**
- * Unit tests for the action's main functionality, src/main.ts
- *
- * These should be run as if the action was called from a workflow.
- * Specifically, the inputs listed in `action.yml` should be set as environment
- * variables following the pattern `INPUT_<INPUT_NAME>`.
+ * Unit tests for src/class/main.ts
  */
 
-import * as core from '@actions/core'
-import * as main from '../src/main'
+import { join } from 'node:path';
+import * as core from '@actions/core';
+//
+import { Main } from '../src/class/main';
 
-// Mock the action's main function
-const runMock = jest.spyOn(main, 'run')
+const mockToken = 'oBgGDgMmhwHAwxJaqBZzImWeypnYKWwQSGtvtYxhNzzYomNINkLaOHAVFCNwtOgXSb';
+const mockVersion = '';
+const mockPrefix = 'v';
+const mockPostfix = 'rc';
+const mockPostfixnoup = false;
+const mockMetadata = '';
+const mockReleasetype = '';
+const mockAuto = false;
+const mockDryrun = true;
 
-// Other utilities
-const timeRegex = /^\d{2}:\d{2}:\d{2}/
+process.env.GITHUB_EVENT_PATH = join(__dirname, 'github_payload.json');
+process.env.GITHUB_REPOSITORY = 'GregoryGost/version-tagger';
+process.env.GITHUB_SHA = 'c3d0be41ecbe669545ee3e94d31ed9a4bc91ee3c';
+process.env.GITHUB_HEAD_REF = 'develop';
 
 // Mock the GitHub Actions core library
-let debugMock: jest.SpyInstance
-let errorMock: jest.SpyInstance
-let getInputMock: jest.SpyInstance
-let setFailedMock: jest.SpyInstance
-let setOutputMock: jest.SpyInstance
+let getInputMock: jest.SpyInstance;
+let getBooleanInputMock: jest.SpyInstance;
+let setFailedMock: jest.SpyInstance;
+let setOutputMock: jest.SpyInstance;
+let infoMock: jest.SpyInstance;
+//
+let runMock: jest.SpyInstance;
 
-describe('action', () => {
+describe('main.ts', () => {
   beforeEach(() => {
-    jest.clearAllMocks()
-
-    debugMock = jest.spyOn(core, 'debug').mockImplementation()
-    errorMock = jest.spyOn(core, 'error').mockImplementation()
-    getInputMock = jest.spyOn(core, 'getInput').mockImplementation()
-    setFailedMock = jest.spyOn(core, 'setFailed').mockImplementation()
-    setOutputMock = jest.spyOn(core, 'setOutput').mockImplementation()
-  })
-
-  it('sets the time output', async () => {
-    // Set the action's inputs as return values from core.getInput()
+    jest.clearAllMocks();
+    //
+    getInputMock = jest.spyOn(core, 'getInput').mockImplementation();
+    getBooleanInputMock = jest.spyOn(core, 'getBooleanInput').mockImplementation();
+    setFailedMock = jest.spyOn(core, 'setFailed').mockImplementation();
+    setOutputMock = jest.spyOn(core, 'setOutput').mockImplementation();
+    infoMock = jest.spyOn(core, 'info').mockImplementation();
+    //
     getInputMock.mockImplementation((name: string): string => {
       switch (name) {
-        case 'milliseconds':
-          return '500'
+        case 'token':
+          return mockToken;
+        case 'version':
+          return mockVersion;
+        case 'prefix':
+          return mockPrefix;
+        case 'postfix':
+          return mockPostfix;
+        case 'metadata':
+          return mockMetadata;
+        case 'releasetype':
+          return mockReleasetype;
         default:
-          return ''
+          return '';
       }
-    })
-
-    await main.run()
-    expect(runMock).toHaveReturned()
-
-    // Verify that all of the core library functions were called correctly
-    expect(debugMock).toHaveBeenNthCalledWith(1, 'Waiting 500 milliseconds ...')
-    expect(debugMock).toHaveBeenNthCalledWith(
-      2,
-      expect.stringMatching(timeRegex)
-    )
-    expect(debugMock).toHaveBeenNthCalledWith(
-      3,
-      expect.stringMatching(timeRegex)
-    )
-    expect(setOutputMock).toHaveBeenNthCalledWith(
-      1,
-      'time',
-      expect.stringMatching(timeRegex)
-    )
-    expect(errorMock).not.toHaveBeenCalled()
-  })
-
-  it('sets a failed status', async () => {
-    // Set the action's inputs as return values from core.getInput()
+    });
+    getBooleanInputMock.mockImplementation((name: string): boolean => {
+      switch (name) {
+        case 'postfixnoup':
+          return mockPostfixnoup;
+        case 'auto':
+          return mockAuto;
+        case 'dryrun':
+          return mockDryrun;
+        default:
+          return false;
+      }
+    });
+  });
+  /**
+   * Instance test
+   */
+  it('main instance', async () => {
+    const mainTest: Main = new Main();
+    expect(mainTest instanceof Main).toBe(true);
+    expect(setFailedMock).not.toHaveBeenCalled();
+  });
+  /**
+   * Main run function only called
+   */
+  it('main run call only', async () => {
+    const mainTest: Main = new Main();
+    runMock = jest.spyOn(mainTest, 'run').mockImplementation();
+    await mainTest.run();
+    expect(runMock).toHaveBeenCalled();
+  });
+  /**
+   * Main run function work
+   */
+  it('main run tag is already exists', async () => {
+    // Tag is already exists
+    const mainTest: Main = new Main();
+    jest.spyOn(mainTest.github, 'getTags').mockImplementation(async (): Promise<string[]> => {
+      return ['v1.0.0-rc.1'];
+    });
+    jest.spyOn(mainTest.tag, 'buildNewTag').mockImplementation((): string => {
+      return 'v1.0.0-rc.1';
+    });
+    await mainTest.run();
+    expect(setFailedMock).toHaveBeenNthCalledWith(1, `Tag "v1.0.0-rc.1" is already exists in repository!!!`);
+  });
+  it('main run ok. dryrun = true', async () => {
+    let mainTest: Main = new Main();
+    // No legacy tags
+    // Empty version
+    jest.spyOn(mainTest.github, 'getTags').mockImplementation(async (): Promise<string[]> => {
+      return [''];
+    });
+    // jest.spyOn(mainTest.tag, 'buildNewTag').mockImplementation((): string => {
+    //   return 'v1.0.0-rc.1';
+    // });
+    await mainTest.run();
+    expect(infoMock).toHaveBeenNthCalledWith(1, 'Dry Run is enabled. Just output new tag version ...');
+    expect(setOutputMock).toHaveBeenNthCalledWith(1, 'newtag', 'v1.0.0-rc.1');
+    expect(setFailedMock).not.toHaveBeenCalled();
+    // Input Custom Version
     getInputMock.mockImplementation((name: string): string => {
       switch (name) {
-        case 'milliseconds':
-          return 'this is not a number'
+        case 'token':
+          return mockToken;
+        case 'version':
+          return '5.6.1';
+        case 'prefix':
+          return mockPrefix;
+        case 'postfix':
+          return mockPostfix;
+        case 'metadata':
+          return mockMetadata;
+        case 'releasetype':
+          return mockReleasetype;
         default:
-          return ''
+          return '';
       }
-    })
-
-    await main.run()
-    expect(runMock).toHaveReturned()
-
-    // Verify that all of the core library functions were called correctly
-    expect(setFailedMock).toHaveBeenNthCalledWith(
-      1,
-      'milliseconds not a number'
-    )
-    expect(errorMock).not.toHaveBeenCalled()
-  })
-})
+    });
+    mainTest = new Main();
+    jest.spyOn(mainTest.github, 'getTags').mockImplementation(async (): Promise<string[]> => {
+      return [''];
+    });
+    await mainTest.run();
+    expect(setOutputMock).toHaveBeenNthCalledWith(2, 'newtag', 'v5.6.1-rc.1');
+    expect(setFailedMock).not.toHaveBeenCalled();
+  });
+  it('main run ok. no dryrun', async () => {
+    getBooleanInputMock.mockImplementation((name: string): boolean => {
+      switch (name) {
+        case 'postfixnoup':
+          return mockPostfixnoup;
+        case 'auto':
+          return mockAuto;
+        case 'dryrun':
+          return false;
+        default:
+          return false;
+      }
+    });
+    const mainTest: Main = new Main();
+    jest.spyOn(mainTest.github, 'getTags').mockImplementation(async (): Promise<string[]> => {
+      return [''];
+    });
+    jest.spyOn(mainTest.github, 'pushNewTag').mockImplementation();
+    await mainTest.run();
+    expect(infoMock).toHaveBeenNthCalledWith(1, 'Pushed new tag "v1.0.0-rc.1" is OK. Work done');
+    expect(setOutputMock).toHaveBeenNthCalledWith(1, 'newtag', 'v1.0.0-rc.1');
+    expect(setFailedMock).not.toHaveBeenCalled();
+  });
+});

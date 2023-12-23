@@ -1,23 +1,56 @@
-name: 'The name of your action here'
-description: 'Provide a description here'
-author: 'Your name or organization here'
+name: 'Version Tagger'
+description: 'GitHub action to automate versioning management. Both major and development versions'
+author: 'GregoryGost'
 
-# Add your action's branding here. This will appear on the GitHub Marketplace.
 branding:
-  icon: 'heart'
-  color: 'red'
+  icon: 'git-branch'
+  color: 'blue'
 
-# Define your inputs here.
 inputs:
-  milliseconds:
-    description: 'Your input description here'
+  token:
+    description: 'The GitHub Token to use for reference management in the repo'
     required: true
-    default: '1000'
+  version:
+    description: 'Version from previous action output. Pattern semver https://semver.org/: `0.0.0`'
+    required: false
+  prefix:
+    description: 'A prefix that will appear immediately before the tag version. Example: `v` => `v1.0.0`'
+    required: false
+  postfix:
+    description: 'Postfix that will appear immediately after the tag version. Example: `beta` => `v1.0.0-beta.0`'
+    required: false
+  postfixnoup:
+    description:
+      'Do not apply version upgrade to postfix. No number will be added to the postfix. Example: `v1.0.0-beta`,
+      `2.5.1-rc`'
+    required: false
+    default: false
+  metadata:
+    description:
+      'Add your own metadata, or use the sliced sha1 version hash.. Example: `build123` or `fyf2c5fr` =>
+      `v1.0.0-beta.1+fyf2c5fr`'
+    required: false
+  releasetype:
+    description:
+      'Release type version. `major`(X.y.z) or `minor`(x.Y.z) or `patch`(x.y.Z). If not specified, then no version will
+      be incremented. All variants: `major`, `premajor`, `minor`, `preminor`, `patch`, `prepatch`, `prerelease`. More in
+      semver doc: https://github.com/npm/node-semver/blob/main/README.md'
+    required: false
+  auto:
+    description:
+      'Used in conjunction with a `releasetype` parameter. Whether to automatically upgrade the version regardless of
+      the committed version in the file. DANGEROUS!!! The version in the file may not match what will be in the tags as
+      a result. If `FALSE`, no automatic promotions will be made.'
+    required: false
+    default: false
+  dryrun:
+    description: 'If this value is true, the tag will not be pushed. Use for test this action'
+    required: false
+    default: false
 
-# Define your outputs here.
 outputs:
-  time:
-    description: 'Your output description here'
+  newtag:
+    description: 'Output of the resulting tag. Example: `v1.0.0` | `v1.2.0-beta.5`'
 
 runs:
   using: node20
