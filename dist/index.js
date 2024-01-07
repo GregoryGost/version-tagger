@@ -32198,16 +32198,18 @@ class Config {
     _inputReleaseType;
     _githubSha;
     _githubHeadRef;
+    _inputUseLastTag;
     constructor(root_path) {
         this.rootPath = root_path ?? Config.getRootDir();
         this._inputToken = (0, core_1.getInput)('token', { required: true });
         this._inputVersion = (0, core_1.getInput)('version', { required: false });
+        this._inputUseLastTag = (0, core_1.getBooleanInput)('uselasttag', { required: false }) ?? false;
         this._inputPrefix = (0, core_1.getInput)('prefix', { required: false });
         this._inputPostfix = (0, core_1.getInput)('postfix', { required: false });
         this._inputPostfixNoUpgrade = (0, core_1.getBooleanInput)('postfixnoup', { required: false }) ?? false;
         this._inputMetadata = (0, core_1.getInput)('metadata', { required: false });
         this._inputReleaseType = (0, core_1.getInput)('releasetype', { required: false });
-        this._autoUpVersion = (0, core_1.getBooleanInput)('dryrun', { required: false }) ?? false;
+        this._autoUpVersion = (0, core_1.getBooleanInput)('auto', { required: false }) ?? false;
         this._dryRun = (0, core_1.getBooleanInput)('dryrun', { required: false }) ?? false;
         this.packageJsonData = this._inputVersion !== undefined && this._inputVersion !== '' ? null : this.getPackageData();
         this._githubSha = this.setGithabSha(process.env.GITHUB_SHA);
@@ -32226,6 +32228,9 @@ class Config {
         if (this.packageJsonData !== null && this.packageJsonData.version !== undefined)
             return this.packageJsonData.version;
         return this.defaultVersion;
+    }
+    set version(new_version) {
+        this._inputVersion = new_version;
     }
     get releaseType() {
         if (!this.checkReleaseType(this._inputReleaseType) || this._inputReleaseType === '')
@@ -32261,6 +32266,9 @@ class Config {
     }
     get githubHeadRef() {
         return this._githubHeadRef;
+    }
+    get useLastTag() {
+        return this._inputUseLastTag;
     }
     static getRootDir() {
         const filename = (0, node_url_1.fileURLToPath)((0, node_url_1.pathToFileURL)(__filename).toString());
@@ -32414,34 +32422,36 @@ const config_1 = __nccwpck_require__(1699);
 const tag_1 = __nccwpck_require__(877);
 const github_1 = __nccwpck_require__(1076);
 class Main {
-    config;
-    _tag;
+    _config;
     _github;
-    constructor() {
-        this.config = new config_1.Config();
-        this._tag = new tag_1.Tag(this.config.version, this.config.prefix, this.config.postfix, this.config.postfixNoUpgrade, this.config.metadata, this.config.releaseType, this.config.autoUp);
-        this._github = new github_1.Github(this.config.token);
-    }
-    get tag() {
-        return this._tag;
+    constructor(root_path) {
+        this._config = new config_1.Config(root_path);
+        this._github = new github_1.Github(this._config.token);
     }
     get github() {
         return this._github;
     }
+    get config() {
+        return this._config;
+    }
     async run() {
         try {
             const repoTags = await this._github.getTags();
-            const newTag = this._tag.buildNewTag();
-            if (repoTags !== null && repoTags.length > 0) {
+            if (this._config.useLastTag && repoTags && repoTags.length > 0) {
+                this._config.version = repoTags[0];
+            }
+            const tagBuilder = new tag_1.Tag(this._config.version, this._config.useLastTag === false ? (repoTags.length > 0 ? repoTags[0] : null) : null, this._config.prefix, this._config.postfix, this._config.postfixNoUpgrade, this._config.metadata, this._config.releaseType, this._config.autoUp);
+            const newTag = tagBuilder.buildNewTag();
+            if (repoTags && repoTags.length > 0 && this._config.autoUp) {
                 if (repoTags.includes(newTag))
                     throw new Error(`Tag "${newTag}" is already exists in repository!!!`);
             }
-            if (this.config.dryRun) {
+            if (this._config.dryRun) {
                 (0, core_1.info)('Dry Run is enabled. Just output new tag version ...');
                 (0, core_1.setOutput)('newtag', newTag);
                 return;
             }
-            await this._github.pushNewTag(newTag, this.config.githubSha, this.config.githubHeadRef);
+            await this._github.pushNewTag(newTag, this._config.githubSha, this._config.githubHeadRef);
             (0, core_1.info)(`Pushed new tag "${newTag}" is OK. Work done`);
             (0, core_1.setOutput)('newtag', newTag);
         }
@@ -32467,6 +32477,7 @@ const semver_1 = __nccwpck_require__(1026);
 const core_1 = __nccwpck_require__(9093);
 class Tag {
     version;
+    lastTag;
     prefix;
     postfix;
     startPostfixIdentifier;
@@ -32476,15 +32487,16 @@ class Tag {
     auto;
     versionRegExp = /(\d+)\.(\d+)\.(\d+)/;
     postfixPatchFrieze;
-    constructor(version, prefix, postfix, postfix_no_up, metadata, release_type, auto) {
+    constructor(version, last_tag, prefix, postfix, postfix_no_up, metadata, release_type, auto) {
         this.version = version;
+        this.lastTag = last_tag ?? null;
         this.prefix = prefix ?? null;
         this.postfix = postfix ?? null;
-        this.startPostfixIdentifier = '1';
         this.postfixNoUp = postfix_no_up ?? false;
         this.metadata = metadata ?? false;
         this.releaseType = release_type ?? null;
         this.auto = auto ?? false;
+        this.startPostfixIdentifier = '1';
         this.postfixPatchFrieze = null;
     }
     buildNewTag() {
@@ -32513,6 +32525,12 @@ class Tag {
                     }
                 }
             }
+            else if (this.releaseType === 'patch') {
+                const newVersion = (0, semver_1.inc)(version, this.releaseType);
+                if (newVersion !== null) {
+                    return newVersion;
+                }
+            }
             return version;
         }
         catch (error) {
@@ -32522,6 +32540,7 @@ class Tag {
     }
     upPostfix(version) {
         if (this.postfix !== null && this.postfix !== '') {
+            version = this.setPostfixForBaseVersion(version);
             const identifier = this.postfixNoUp ? false : this.startPostfixIdentifier;
             const versionUpPostfix = (0, semver_1.inc)(version, 'prerelease', this.postfix, identifier);
             if (versionUpPostfix === null)
@@ -32541,6 +32560,25 @@ class Tag {
             return `+${this.metadata}`;
         }
         return '';
+    }
+    setPostfixForBaseVersion(version) {
+        if (this.lastTag !== null && this.lastTag !== '') {
+            const parseVersion = (0, semver_1.parse)(version);
+            const parseLastTag = (0, semver_1.parse)(this.lastTag);
+            if (parseLastTag !== null && parseVersion !== null) {
+                if (parseVersion.major === parseLastTag.major &&
+                    parseVersion.minor === parseLastTag.minor &&
+                    parseVersion.patch === parseLastTag.patch) {
+                    if (parseLastTag.prerelease.length > 0 && parseLastTag.prerelease[0] !== undefined) {
+                        version += `-${parseLastTag.prerelease[0]}`;
+                    }
+                    if (parseLastTag.prerelease.length > 0 && parseLastTag.prerelease[1] !== undefined) {
+                        version += `.${parseLastTag.prerelease[1]}`;
+                    }
+                }
+            }
+        }
+        return version;
     }
 }
 exports.Tag = Tag;

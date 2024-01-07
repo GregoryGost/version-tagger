@@ -15,6 +15,7 @@ import type {
  * Github class
  * Used Octokit package. Based on GitHub API:
  * * DOC: https://docs.github.com/en/actions/learn-github-actions/variables#default-environment-variables
+ * * DOC: https://docs.github.com/en/rest/repos/repos?apiVersion=2022-11-28#list-repository-tags
  * * DOC: https://docs.github.com/en/rest/commits/commits?apiVersion=2022-11-28#compare-two-commits
  * * DOC: https://docs.github.com/en/rest/git/tags?apiVersion=2022-11-28#create-a-tag-object
  * * DOC: https://docs.github.com/en/rest/git/refs?apiVersion=2022-11-28#create-a-reference
@@ -69,6 +70,7 @@ class Github {
 
   /**
    * Get Repository Tags
+   * * DOC: https://docs.github.com/en/rest/repos/repos?apiVersion=2022-11-28#list-repository-tags
    * @returns @returns {string[]} Tags `array`
    */
   async getTags(): Promise<string[]> {

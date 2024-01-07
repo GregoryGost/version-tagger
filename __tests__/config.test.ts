@@ -56,7 +56,7 @@ describe('config.ts', () => {
   /**
    * Get input version test
    */
-  it('get input version', async () => {
+  it('get version from action input', async () => {
     getInputMock.mockImplementation((name: string): string => {
       switch (name) {
         case 'version':
@@ -69,7 +69,7 @@ describe('config.ts', () => {
     expect(config.version).toBe('5.5.5');
   });
   /**
-   * Get version test from package.json
+   * Get version test from `package.json`
    */
   it('get version from package.json', async () => {
     const config: Config = new Config();
@@ -85,6 +85,24 @@ describe('config.ts', () => {
     const testDir: string = normalize(join(cwd(), '__tests__'));
     const config: Config = new Config(testDir);
     expect(config.version).toBe('0.1.0');
+  });
+  /**
+   * Set version test for last tag enabled
+   * Return version from `package.json`
+   */
+  it('set new version (use last tag = true)', async () => {
+    getBooleanInputMock.mockImplementation((name: string): boolean => {
+      switch (name) {
+        case 'uselasttag':
+          return true;
+        default:
+          return false;
+      }
+    });
+    const config: Config = new Config();
+    expect(config.version).toBe('1.0.0');
+    config.version = '1.5.6';
+    expect(config.version).toBe('1.5.6');
   });
   /**
    * Get input token test

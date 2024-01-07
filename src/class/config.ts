@@ -37,7 +37,7 @@ class Config {
    * `OPTIONAL` Version from Github Action Inputs
    * Example: `1.0.0`
    */
-  private readonly _inputVersion: string;
+  private _inputVersion: string;
   /**
    * `OPTIONAL` Prefix from Github Action Inputs
    * Example: `v`
@@ -101,17 +101,24 @@ class Config {
    * For example, `feature-branch-1`.
    */
   private readonly _githubHeadRef: string;
+  /**
+   * Use latest available tag as source version.
+   * Applies the latest available tag received from the repository for the source version.
+   * If there are no available tags, it takes the version from the `package.json` file
+   */
+  private readonly _inputUseLastTag: boolean;
 
   constructor(root_path?: string) {
     this.rootPath = root_path ?? Config.getRootDir();
     this._inputToken = getInput('token', { required: true });
     this._inputVersion = getInput('version', { required: false });
+    this._inputUseLastTag = getBooleanInput('uselasttag', { required: false }) ?? false;
     this._inputPrefix = getInput('prefix', { required: false });
     this._inputPostfix = getInput('postfix', { required: false });
     this._inputPostfixNoUpgrade = getBooleanInput('postfixnoup', { required: false }) ?? false;
     this._inputMetadata = getInput('metadata', { required: false });
     this._inputReleaseType = getInput('releasetype', { required: false }) as ReleaseTypeT;
-    this._autoUpVersion = getBooleanInput('dryrun', { required: false }) ?? false;
+    this._autoUpVersion = getBooleanInput('auto', { required: false }) ?? false;
     this._dryRun = getBooleanInput('dryrun', { required: false }) ?? false;
     //
     this.packageJsonData = this._inputVersion !== undefined && this._inputVersion !== '' ? null : this.getPackageData();
@@ -146,6 +153,14 @@ class Config {
     if (this.packageJsonData !== null && this.packageJsonData.version !== undefined)
       return this.packageJsonData.version;
     return this.defaultVersion;
+  }
+
+  /**
+   * Set node project actual version
+   * @param {string} new_version New version for source. Example: `v1.5.7-release`
+   */
+  set version(new_version: string) {
+    this._inputVersion = new_version;
   }
 
   /**
@@ -214,6 +229,7 @@ class Config {
 
   /**
    * Get commit SHA that triggered the workflow.
+   * @returns {string} Github SHA. Exampe: `ffac537e6cbbf934b08745a378932722df287a53`
    */
   get githubSha(): string {
     return this._githubSha;
@@ -221,9 +237,18 @@ class Config {
 
   /**
    * Get head ref or source branch of the pull request in a workflow run.
+   * @returns {string} Head ref or source branch. Example: `feature-branch-1`
    */
   get githubHeadRef(): string {
     return this._githubHeadRef;
+  }
+
+  /**
+   * Get Use latest available tag as source version
+   * @returns {boolean} Use latest available tag flag. Default: `false`
+   */
+  get useLastTag(): boolean {
+    return this._inputUseLastTag;
   }
 
   /**

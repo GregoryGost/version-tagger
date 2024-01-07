@@ -13,6 +13,12 @@ inputs:
   version:
     description: 'Version from previous action output. Pattern semver https://semver.org/: `0.0.0`'
     required: false
+  uselasttag:
+    description:
+      'Use latest available tag as source version. Applies the latest available tag received from the repository for the
+      source version. If there are no available tags, it takes the version from the `package.json` file'
+    required: false
+    default: false
   prefix:
     description: 'A prefix that will appear immediately before the tag version. Example: `v` => `v1.0.0`'
     required: false

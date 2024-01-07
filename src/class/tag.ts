@@ -1,7 +1,8 @@
 import { createHmac } from 'node:crypto';
-import { inc, clean } from 'semver';
+import { inc, clean, parse } from 'semver';
 import { setFailed } from '@actions/core';
 //
+import type { SemVer } from 'semver';
 import type { ReleaseTypeT } from '../types';
 import type { IdentifierBase } from 'semver/functions/inc';
 
@@ -13,14 +14,21 @@ class Tag {
   /**
    * Input source version.
    * From Githab Action Input, or `package.json` file
+   * ---
+   * If the version is obtained from the package.json file and postfix is used, then the last tag must be used.
+   * Because only the last tag contains the last postfix index.
    */
   private readonly version: string;
+  /**
+   * Last tag from Git repo
+   */
+  private readonly lastTag: string | null;
   /**
    * Custom Prefix for version. Example: `v`
    */
   private readonly prefix: string | null;
   /**
-   * Custom Postfix for version. Example: `-beta`
+   * Custom Postfix for version. Example: `beta`, `rc`
    */
   private readonly postfix: string | null;
   /**
@@ -37,13 +45,15 @@ class Tag {
   /**
    * Additional metadata for tag
    * If boolean `true`. Trim SHA commit
-   * Example: `+fyf2c5fr`, `+build123`
+   * Example: `true`, `false` || `build123`
+   * Default: `false`
    */
   private readonly metadata: string | boolean;
   /**
    * Release type version.
    * `major`(X.y.z) or `minor`(x.Y.z) or `patch`(x.y.Z).
    * If not specified, then no version will be incremented.
+   * Default: `null`
    */
   private readonly releaseType: ReleaseTypeT | null;
   /**
@@ -65,6 +75,7 @@ class Tag {
 
   constructor(
     version: string,
+    last_tag?: string | null,
     prefix?: string | null,
     postfix?: string | null,
     postfix_no_up?: boolean,
@@ -73,19 +84,21 @@ class Tag {
     auto?: boolean
   ) {
     this.version = version;
+    this.lastTag = last_tag ?? null;
     this.prefix = prefix ?? null;
     this.postfix = postfix ?? null;
-    this.startPostfixIdentifier = '1';
     this.postfixNoUp = postfix_no_up ?? false;
     this.metadata = metadata ?? false;
     this.releaseType = release_type ?? null;
     this.auto = auto ?? false;
+    //
+    this.startPostfixIdentifier = '1';
     this.postfixPatchFrieze = null;
   }
 
   /**
-   * Main new tag builder
-   * @returns {string} New tag
+   * New tag builder
+   * @returns {string} New tag / version
    */
   buildNewTag(): string {
     let newVersion: string = this.upVersion();
@@ -97,7 +110,7 @@ class Tag {
 
   /**
    * Up Version
-   * If AUTO `true`: major, minor, patch.
+   * If AUTO `true`: major, minor, patch or prerelease
    * If AUTO `false` - no up version (Manual)
    * @returns {string} Updated version or not changed version
    */
@@ -117,6 +130,11 @@ class Tag {
           if (newVersion !== null) {
             return newVersion;
           }
+        }
+      } else if (this.releaseType === 'patch') {
+        const newVersion: string | null = inc(version, this.releaseType);
+        if (newVersion !== null) {
+          return newVersion;
         }
       }
       return version;
@@ -138,7 +156,11 @@ class Tag {
    * @returns {string} Version with updated postfix
    */
   private upPostfix(version: string): string {
+    // If postfix enabled
     if (this.postfix !== null && this.postfix !== '') {
+      // If las tag exists postfix, change version. Get postfix from last tag
+      version = this.setPostfixForBaseVersion(version);
+      // next
       const identifier: false | IdentifierBase | undefined = this.postfixNoUp ? false : this.startPostfixIdentifier;
       const versionUpPostfix: string | null = inc(version, 'prerelease', this.postfix, identifier);
       if (versionUpPostfix === null) return version;
@@ -166,6 +188,38 @@ class Tag {
       return `+${this.metadata}`;
     }
     return '';
+  }
+
+  /**
+   * Set postfix for base version
+   * @param {string} version Raw version (from package.json - example 2.0.0)
+   * @returns {string} postfixed version if set postfix and last tag is exists
+   */
+  private setPostfixForBaseVersion(version: string): string {
+    // If las tag exists postfix, change version. Get postfix from last tag
+    if (this.lastTag !== null && this.lastTag !== '') {
+      const parseVersion: SemVer | null = parse(version);
+      const parseLastTag: SemVer | null = parse(this.lastTag);
+      if (parseLastTag !== null && parseVersion !== null) {
+        if (
+          parseVersion.major === parseLastTag.major &&
+          parseVersion.minor === parseLastTag.minor &&
+          parseVersion.patch === parseLastTag.patch
+        ) {
+          // Parse version prerelease
+          // [] - if example v2.0.0
+          // ['dev'] - if example v2.0.0-dev
+          // ['dev', 1] - if example v2.0.0-dev.1
+          if (parseLastTag.prerelease.length > 0 && parseLastTag.prerelease[0] !== undefined) {
+            version += `-${parseLastTag.prerelease[0]}`;
+          }
+          if (parseLastTag.prerelease.length > 0 && parseLastTag.prerelease[1] !== undefined) {
+            version += `.${parseLastTag.prerelease[1]}`;
+          }
+        }
+      }
+    }
+    return version;
   }
 }
 
