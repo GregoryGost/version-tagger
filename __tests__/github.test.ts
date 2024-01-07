@@ -116,7 +116,7 @@ describe('github.ts', () => {
     });
     const githubTest: Github = new Github(mockToken);
     const tagFromFunc: string[] = await githubTest.getTags();
-    expect(infoMock).toHaveBeenNthCalledWith(1, 'Tags not received');
+    expect(infoMock).toHaveBeenNthCalledWith(1, 'Tags not received from github repo');
     expect(tagFromFunc.length).toBe(0);
     expect(githubTest.tags.length).toBe(0);
     expect(setFailedMock).not.toHaveBeenCalled();

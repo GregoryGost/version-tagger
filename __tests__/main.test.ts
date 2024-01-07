@@ -128,7 +128,7 @@ describe('main.ts', () => {
     //   return 'v1.0.0-rc.1';
     // });
     await mainTest.run();
-    expect(infoMock).toHaveBeenNthCalledWith(1, 'Dry Run is enabled. Just output new tag version ...');
+    expect(infoMock).toHaveBeenNthCalledWith(1, 'Dry Run is enabled. Just output new tag version "v1.0.0-rc.1" ...');
     expect(setOutputMock).toHaveBeenNthCalledWith(1, 'newtag', 'v1.0.0-rc.1');
     expect(setFailedMock).not.toHaveBeenCalled();
     // Input Custom Version

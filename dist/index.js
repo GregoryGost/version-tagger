@@ -32342,7 +32342,7 @@ class Github {
                 (0, core_1.info)(`Tags received ${JSON.stringify(this._tags)}`);
             }
             else
-                (0, core_1.info)('Tags not received');
+                (0, core_1.info)('Tags not received from github repo');
             return this._tags;
         }
         catch (error) {
@@ -32447,7 +32447,7 @@ class Main {
                     throw new Error(`Tag "${newTag}" is already exists in repository!!!`);
             }
             if (this._config.dryRun) {
-                (0, core_1.info)('Dry Run is enabled. Just output new tag version ...');
+                (0, core_1.info)(`Dry Run is enabled. Just output new tag version "${newTag}" ...`);
                 (0, core_1.setOutput)('newtag', newTag);
                 return;
             }

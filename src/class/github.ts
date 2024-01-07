@@ -86,7 +86,7 @@ class Github {
       if (tags.length > 0) {
         this._tags = tags;
         info(`Tags received ${JSON.stringify(this._tags)}`);
-      } else info('Tags not received');
+      } else info('Tags not received from github repo');
       return this._tags;
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {

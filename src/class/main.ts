@@ -71,7 +71,7 @@ class Main {
       }
       // if dry run - only output
       if (this._config.dryRun) {
-        info('Dry Run is enabled. Just output new tag version ...');
+        info(`Dry Run is enabled. Just output new tag version "${newTag}" ...`);
         setOutput('newtag', newTag);
         return;
       }
