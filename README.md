@@ -1,4 +1,4 @@
-# Version Tagger (beta)
+# Version Tagger
 
 ![License](https://img.shields.io/github/license/GregoryGost/version-tagger)
 ![RepoSize](https://img.shields.io/github/repo-size/GregoryGost/version-tagger)

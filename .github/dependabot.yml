@@ -1,4 +1,4 @@
-version: 2
+version: 3
 updates:
   - package-ecosystem: github-actions
     directory: /
@@ -15,12 +15,12 @@ updates:
     schedule:
       interval: weekly
     groups:
-      pnpm-development:
+      development:
         dependency-type: development
         update-types:
           - minor
           - patch
-      pnpm-production:
+      production:
         dependency-type: production
         update-types:
           - patch
