@@ -28,16 +28,16 @@ jobs:
         id: checkout
         uses: actions/checkout@v4
 
+      - name: Install pnpm
+        id: setup-pnpm
+        run: curl -fsSL https://get.pnpm.io/install.sh | sh -
+
       - name: Setup Node.js
         id: setup-node
         uses: actions/setup-node@v4
         with:
           node-version-file: .node-version
           cache: pnpm
-
-      - name: Install pnpm
-        id: setup-pnpm
-        run: npm install -g pnpm
 
       - name: Install Dependencies
         id: install
