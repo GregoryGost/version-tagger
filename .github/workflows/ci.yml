@@ -63,9 +63,10 @@ jobs:
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           prefix: 'v'
-          postfix: 'test'
+          postfix: 'testaction'
+          postfixnoup: true
           dryrun: true
 
       - name: Print Output
         id: output
-        run: echo "${{ steps.test-action.outputs.time }}"
+        run: echo "${{ steps.test-action.outputs.newtag }}"
