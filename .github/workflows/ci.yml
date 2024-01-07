@@ -61,7 +61,9 @@ jobs:
         id: test-action
         uses: ./
         with:
-          milliseconds: 2000
+          prefix: 'v'
+          postfix: 'test'
+          dryrun: true
 
       - name: Print Output
         id: output
