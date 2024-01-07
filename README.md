@@ -21,14 +21,6 @@ GitHub Action to automate versioning management.
 
 Change or check repo setting for action
 
-## Usage
-
-Basic example for use this action. Develop tagging. Production tagging.
-
-```yml
-
-```
-
 ## Config options
 
 Configure for this action
@@ -52,6 +44,14 @@ Configure for this action
 | name       | description                                                   |
 | ---------- | ------------------------------------------------------------- |
 | **newtag** | The GitHub Token to use for reference management in the repo. |
+
+## Usage
+
+Basic example for use this action. Develop tagging. Production tagging.
+
+```yml
+
+```
 
 ## Contrib
 
