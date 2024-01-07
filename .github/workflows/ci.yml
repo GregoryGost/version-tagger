@@ -61,6 +61,7 @@ jobs:
         id: test-action
         uses: ./
         with:
+          token: ${{ secrets.GITHUB_TOKEN }}
           prefix: 'v'
           postfix: 'test'
           dryrun: true
