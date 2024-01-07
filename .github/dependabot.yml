@@ -10,17 +10,17 @@ updates:
           - minor
           - patch
 
-  - package-ecosystem: pnpm
+  - package-ecosystem: npm
     directory: /
     schedule:
       interval: weekly
     groups:
-      pnpm-development:
+      development:
         dependency-type: development
         update-types:
           - minor
           - patch
-      pnpm-production:
+      production:
         dependency-type: production
         update-types:
           - patch
