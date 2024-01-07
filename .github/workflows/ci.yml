@@ -44,7 +44,7 @@ jobs:
         id: pnpm-lint
         run: pnpm run lint
 
-      - name: Test
+      - name: Tests
         id: pnpm-ci-test
         run: pnpm run ci-test
 
