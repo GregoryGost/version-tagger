@@ -116,25 +116,34 @@ class Tag {
    */
   private upVersion(): string {
     try {
+      //
+      // Clear version. Prefix remove
       const version: string | null = clean(this.version);
       if (version === null) throw new Error(`Error clean version "${this.version}"`);
+      //
       // Get patch version for frieze
       if (this.postfix !== null && this.postfix !== '' && this.releaseType === null) {
         const versionMatch: RegExpMatchArray | null = version.match(this.versionRegExp);
         if (versionMatch !== null) this.postfixPatchFrieze = String(versionMatch[3]);
       }
-      // Auto up if enabled
-      if (this.auto === true) {
-        if (this.releaseType !== null && this.releaseType !== '') {
-          const newVersion: string | null = inc(version, this.releaseType);
-          if (newVersion !== null) {
-            return newVersion;
+      //
+      // Update version
+      // If version prerelease change to release version
+      // Example: 3.0.0-dev.1 => 3.0.0
+      if (this.releaseType !== null && this.releaseType !== '') {
+        const updatedVersion: string | null = inc(version, this.releaseType);
+        if (updatedVersion !== null) {
+          //
+          // If necessary, in addition to conversion, upgrade the version
+          // Example minor: 3.0.0-dev.1 => 3.0.0 => 3.1.0
+          // !!! Not used when using postfix !!!
+          if (this.auto && this.postfix === null) {
+            const upVersion: string | null = inc(updatedVersion, this.releaseType);
+            if (upVersion !== null) {
+              return upVersion;
+            }
           }
-        }
-      } else if (this.releaseType === 'patch') {
-        const newVersion: string | null = inc(version, this.releaseType);
-        if (newVersion !== null) {
-          return newVersion;
+          return updatedVersion;
         }
       }
       return version;

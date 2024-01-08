@@ -262,7 +262,6 @@ describe('main.ts', () => {
     getBooleanInputMock.mockImplementation((name: string): boolean => {
       switch (name) {
         case 'auto':
-          return true;
         case 'uselasttag':
         case 'postfixnoup':
         case 'dryrun':
@@ -287,7 +286,7 @@ describe('main.ts', () => {
     expect(mainTest.config.postfixNoUpgrade).toBe(false);
     expect(mainTest.config.metadata).toBe(false);
     expect(mainTest.config.releaseType).toBe('patch');
-    expect(mainTest.config.autoUp).toBe(true);
+    expect(mainTest.config.autoUp).toBe(false);
     expect(mainTest.config.dryRun).toBe(false);
     // Run
     await mainTest.run();
@@ -320,7 +319,6 @@ describe('main.ts', () => {
     getBooleanInputMock.mockImplementation((name: string): boolean => {
       switch (name) {
         case 'auto':
-          return true;
         case 'uselasttag':
         case 'postfixnoup':
         case 'dryrun':
@@ -345,7 +343,7 @@ describe('main.ts', () => {
     expect(mainTest.config.postfixNoUpgrade).toBe(false);
     expect(mainTest.config.metadata).toBe(false);
     expect(mainTest.config.releaseType).toBe('minor');
-    expect(mainTest.config.autoUp).toBe(true);
+    expect(mainTest.config.autoUp).toBe(false);
     expect(mainTest.config.dryRun).toBe(false);
     // Run
     await mainTest.run();
@@ -378,7 +376,6 @@ describe('main.ts', () => {
     getBooleanInputMock.mockImplementation((name: string): boolean => {
       switch (name) {
         case 'auto':
-          return true;
         case 'uselasttag':
         case 'postfixnoup':
         case 'dryrun':
@@ -403,7 +400,7 @@ describe('main.ts', () => {
     expect(mainTest.config.postfixNoUpgrade).toBe(false);
     expect(mainTest.config.metadata).toBe(false);
     expect(mainTest.config.releaseType).toBe('major');
-    expect(mainTest.config.autoUp).toBe(true);
+    expect(mainTest.config.autoUp).toBe(false);
     expect(mainTest.config.dryRun).toBe(false);
     // Run
     await mainTest.run();
@@ -612,10 +609,9 @@ describe('main.ts', () => {
     });
     getBooleanInputMock.mockImplementation((name: string): boolean => {
       switch (name) {
-        case 'auto':
-          return true;
         case 'uselasttag':
           return true;
+        case 'auto':
         case 'postfixnoup':
         case 'dryrun':
         default:
@@ -639,7 +635,7 @@ describe('main.ts', () => {
     expect(mainTest.config.postfixNoUpgrade).toBe(false);
     expect(mainTest.config.metadata).toBe(false);
     expect(mainTest.config.releaseType).toBe('minor');
-    expect(mainTest.config.autoUp).toBe(true);
+    expect(mainTest.config.autoUp).toBe(false);
     expect(mainTest.config.dryRun).toBe(false);
     // Run
     await mainTest.run();
@@ -673,10 +669,9 @@ describe('main.ts', () => {
     });
     getBooleanInputMock.mockImplementation((name: string): boolean => {
       switch (name) {
-        case 'auto':
-          return true;
         case 'uselasttag':
           return true;
+        case 'auto':
         case 'postfixnoup':
         case 'dryrun':
         default:
@@ -700,7 +695,7 @@ describe('main.ts', () => {
     expect(mainTest.config.postfixNoUpgrade).toBe(false);
     expect(mainTest.config.metadata).toBe(false);
     expect(mainTest.config.releaseType).toBe('patch');
-    expect(mainTest.config.autoUp).toBe(true);
+    expect(mainTest.config.autoUp).toBe(false);
     expect(mainTest.config.dryRun).toBe(false);
     // Run
     await mainTest.run();
@@ -746,7 +741,7 @@ describe('main.ts', () => {
       }
     });
     // Set test root dir
-    let testRootDir: string = normalize(join(cwd(), '__tests__', 'package_version_2.6.3'));
+    let testRootDir: string = normalize(join(cwd(), '__tests__'));
     // Main instance
     let mainTest: Main = new Main(testRootDir);
     // Empty latest versions in repo
@@ -756,7 +751,7 @@ describe('main.ts', () => {
     jest.spyOn(mainTest.github, 'pushNewTag').mockImplementation();
     // Input params check
     expect(mainTest.config.token).toBe(mockToken);
-    expect(mainTest.config.version).toBe('2.6.3'); // before get from package.json
+    expect(mainTest.config.version).toBe('0.1.0'); // before get default
     expect(mainTest.config.useLastTag).toBe(true);
     expect(mainTest.config.prefix).toBe('v');
     expect(mainTest.config.postfix).toBe('beta');
@@ -767,25 +762,25 @@ describe('main.ts', () => {
     expect(mainTest.config.dryRun).toBe(false);
     // Run
     await mainTest.run();
-    expect(mainTest.config.version).toBe('2.6.3'); // after get from last repo tag
-    expect(infoMock).toHaveBeenNthCalledWith(1, 'Pushed new tag "v2.6.3-beta.1" is OK. Work done');
-    expect(setOutputMock).toHaveBeenNthCalledWith(1, 'newtag', 'v2.6.3-beta.1');
+    expect(mainTest.config.version).toBe('0.1.0'); // after get from last repo tag
+    expect(infoMock).toHaveBeenNthCalledWith(1, 'Pushed new tag "v0.1.0-beta.1" is OK. Work done');
+    expect(setOutputMock).toHaveBeenNthCalledWith(1, 'newtag', 'v0.1.0-beta.1');
     expect(setFailedMock).not.toHaveBeenCalled();
     //
     // 2. UP DEVELOP
     //
-    lastTagVersions = ['v2.6.3-beta.1'];
+    lastTagVersions = ['v0.1.0-beta.1'];
     await mainTest.run();
-    expect(mainTest.config.version).toBe('v2.6.3-beta.1'); // after get from last repo tag
-    expect(infoMock).toHaveBeenNthCalledWith(2, 'Pushed new tag "v2.6.3-beta.2" is OK. Work done');
-    expect(setOutputMock).toHaveBeenNthCalledWith(2, 'newtag', 'v2.6.3-beta.2');
+    expect(mainTest.config.version).toBe('v0.1.0-beta.1'); // after get from last repo tag
+    expect(infoMock).toHaveBeenNthCalledWith(2, 'Pushed new tag "v0.1.0-beta.2" is OK. Work done');
+    expect(setOutputMock).toHaveBeenNthCalledWith(2, 'newtag', 'v0.1.0-beta.2');
     expect(setFailedMock).not.toHaveBeenCalled();
     // next develop up
-    lastTagVersions = ['v2.6.3-beta.2', 'v2.6.3-beta.1'];
+    lastTagVersions = ['v0.1.0-beta.2', 'v0.1.0-beta.1'];
     await mainTest.run();
-    expect(mainTest.config.version).toBe('v2.6.3-beta.2'); // after get from last repo tag
-    expect(infoMock).toHaveBeenNthCalledWith(3, 'Pushed new tag "v2.6.3-beta.3" is OK. Work done');
-    expect(setOutputMock).toHaveBeenNthCalledWith(3, 'newtag', 'v2.6.3-beta.3');
+    expect(mainTest.config.version).toBe('v0.1.0-beta.2'); // after get from last repo tag
+    expect(infoMock).toHaveBeenNthCalledWith(3, 'Pushed new tag "v0.1.0-beta.3" is OK. Work done');
+    expect(setOutputMock).toHaveBeenNthCalledWith(3, 'newtag', 'v0.1.0-beta.3');
     expect(setFailedMock).not.toHaveBeenCalled();
     //
     // 3. DEVELOP TO RELEASE
@@ -817,9 +812,9 @@ describe('main.ts', () => {
           return false;
       }
     });
-    lastTagVersions = ['v2.6.3-beta.3', 'v2.6.3-beta.2', 'v2.6.3-beta.1'];
+    lastTagVersions = ['v0.1.0-beta.3', 'v0.1.0-beta.2', 'v0.1.0-beta.1'];
     // Set test root dir
-    testRootDir = normalize(join(cwd(), '__tests__', 'package_version_2.6.12'));
+    testRootDir = normalize(join(cwd(), '__tests__', 'package_version_2.6.3'));
     // Main instance
     mainTest = new Main(testRootDir);
     // Empty latest versions in repo
@@ -829,7 +824,7 @@ describe('main.ts', () => {
     jest.spyOn(mainTest.github, 'pushNewTag').mockImplementation();
     // Input params check
     expect(mainTest.config.token).toBe(mockToken);
-    expect(mainTest.config.version).toBe('2.6.12'); // before get from package.json
+    expect(mainTest.config.version).toBe('2.6.3'); // before get from package.json
     expect(mainTest.config.useLastTag).toBe(true);
     expect(mainTest.config.prefix).toBe('v');
     expect(mainTest.config.postfix).toBe(null);
@@ -840,9 +835,9 @@ describe('main.ts', () => {
     expect(mainTest.config.dryRun).toBe(false);
     // Run
     await mainTest.run();
-    expect(mainTest.config.version).toBe('v2.6.3-beta.3'); // after get from last repo tag
-    expect(infoMock).toHaveBeenNthCalledWith(4, 'Pushed new tag "v2.6.3" is OK. Work done');
-    expect(setOutputMock).toHaveBeenNthCalledWith(4, 'newtag', 'v2.6.3');
+    expect(mainTest.config.version).toBe('v0.1.0-beta.3'); // after get from last repo tag
+    expect(infoMock).toHaveBeenNthCalledWith(4, 'Pushed new tag "v0.1.0" is OK. Work done');
+    expect(setOutputMock).toHaveBeenNthCalledWith(4, 'newtag', 'v0.1.0');
     expect(setFailedMock).not.toHaveBeenCalled();
   });
   it('Example version flow: package.json: [develop] => [main/master]', async () => {
@@ -929,6 +924,397 @@ describe('main.ts', () => {
     await mainTest.run();
     expect(infoMock).toHaveBeenNthCalledWith(3, 'Pushed new tag "v2.6.12-dev.1" is OK. Work done');
     expect(setOutputMock).toHaveBeenNthCalledWith(3, 'newtag', 'v2.6.12-dev.1');
+    expect(setFailedMock).not.toHaveBeenCalled();
+  });
+  /**
+   * 10. Example README.md
+   */
+  it('1. Example: Version from package.json', async () => {
+    const lastTagVersions: string[] = [];
+    // Action Input
+    getInputMock.mockImplementation((name: string): string => {
+      switch (name) {
+        case 'token':
+          return mockToken;
+        case 'prefix':
+          return 'v';
+        case 'postfix':
+        case 'releasetype':
+        case 'version':
+        case 'metadata':
+        default:
+          return '';
+      }
+    });
+    getBooleanInputMock.mockImplementation((name: string): boolean => {
+      switch (name) {
+        case 'uselasttag':
+        case 'auto':
+        case 'postfixnoup':
+        case 'dryrun':
+        default:
+          return false;
+      }
+    });
+    // Set test root dir
+    const testRootDir: string = normalize(join(cwd(), '__tests__', 'package_version_2.6.3'));
+    // Main instance
+    const mainTest: Main = new Main(testRootDir);
+    // Empty latest versions in repo
+    jest.spyOn(mainTest.github, 'getTags').mockImplementation(async (): Promise<string[]> => {
+      return lastTagVersions;
+    });
+    jest.spyOn(mainTest.github, 'pushNewTag').mockImplementation();
+    // Run
+    await mainTest.run();
+    expect(infoMock).toHaveBeenNthCalledWith(1, 'Pushed new tag "v2.6.3" is OK. Work done');
+    expect(setOutputMock).toHaveBeenNthCalledWith(1, 'newtag', 'v2.6.3');
+    expect(setFailedMock).not.toHaveBeenCalled();
+  });
+  it('2. Example: External version input (no use package.json)', async () => {
+    const lastTagVersions: string[] = [];
+    // Action Input
+    getInputMock.mockImplementation((name: string): string => {
+      switch (name) {
+        case 'token':
+          return mockToken;
+        case 'version':
+          return '5.0.0';
+        case 'prefix':
+          return 'v';
+        case 'postfix':
+        case 'releasetype':
+        case 'metadata':
+        default:
+          return '';
+      }
+    });
+    getBooleanInputMock.mockImplementation((name: string): boolean => {
+      switch (name) {
+        case 'uselasttag':
+        case 'auto':
+        case 'postfixnoup':
+        case 'dryrun':
+        default:
+          return false;
+      }
+    });
+    // Set test root dir
+    const testRootDir: string = normalize(join(cwd(), '__tests__', 'package_version_2.6.3'));
+    // Main instance
+    const mainTest: Main = new Main(testRootDir);
+    // Empty latest versions in repo
+    jest.spyOn(mainTest.github, 'getTags').mockImplementation(async (): Promise<string[]> => {
+      return lastTagVersions;
+    });
+    jest.spyOn(mainTest.github, 'pushNewTag').mockImplementation();
+    // Run
+    await mainTest.run();
+    expect(infoMock).toHaveBeenNthCalledWith(1, 'Pushed new tag "v5.0.0" is OK. Work done');
+    expect(setOutputMock).toHaveBeenNthCalledWith(1, 'newtag', 'v5.0.0');
+    expect(setFailedMock).not.toHaveBeenCalled();
+  });
+  it('3. Example: Repository last tag version (no use package.json)', async () => {
+    let lastTagVersions: string[] = ['v3.0.0-rc.12', 'v3.0.0-rc.11', 'v3.0.0-rc.10'];
+    let releaseType = 'patch';
+    // Action Input
+    getInputMock.mockImplementation((name: string): string => {
+      switch (name) {
+        case 'token':
+          return mockToken;
+        case 'prefix':
+          return 'v';
+        case 'releasetype':
+          return releaseType;
+        case 'version':
+        case 'postfix':
+        case 'metadata':
+        default:
+          return '';
+      }
+    });
+    getBooleanInputMock.mockImplementation((name: string): boolean => {
+      switch (name) {
+        case 'uselasttag':
+          return true;
+        case 'auto':
+        case 'postfixnoup':
+        case 'dryrun':
+        default:
+          return false;
+      }
+    });
+    // Set test root dir
+    const testRootDir: string = normalize(join(cwd(), '__tests__', 'package_version_2.6.3'));
+    // Main instance
+    let mainTest: Main = new Main(testRootDir);
+    // Empty latest versions in repo
+    jest.spyOn(mainTest.github, 'getTags').mockImplementation(async (): Promise<string[]> => {
+      return lastTagVersions;
+    });
+    jest.spyOn(mainTest.github, 'pushNewTag').mockImplementation();
+    // Run
+    // Prerelease to Release and patch up v3.0.0-rc.12 => v3.0.0
+    await mainTest.run();
+    expect(infoMock).toHaveBeenNthCalledWith(1, 'Pushed new tag "v3.0.0" is OK. Work done');
+    expect(setOutputMock).toHaveBeenNthCalledWith(1, 'newtag', 'v3.0.0');
+    expect(setFailedMock).not.toHaveBeenCalled();
+    //
+    releaseType = 'minor';
+    mainTest = new Main(testRootDir);
+    // Empty latest versions in repo
+    jest.spyOn(mainTest.github, 'getTags').mockImplementation(async (): Promise<string[]> => {
+      return lastTagVersions;
+    });
+    jest.spyOn(mainTest.github, 'pushNewTag').mockImplementation();
+    // Run
+    // Prerelease to Release and patch up v3.0.0-rc.12 => v3.0.0
+    await mainTest.run();
+    expect(infoMock).toHaveBeenNthCalledWith(2, 'Pushed new tag "v3.0.0" is OK. Work done');
+    expect(setOutputMock).toHaveBeenNthCalledWith(2, 'newtag', 'v3.0.0');
+    expect(setFailedMock).not.toHaveBeenCalled();
+    //
+    releaseType = 'minor';
+    lastTagVersions = ['v3.0.0', 'v3.0.0-rc.12', 'v3.0.0-rc.11', 'v3.0.0-rc.10'];
+    mainTest = new Main(testRootDir);
+    // Empty latest versions in repo
+    jest.spyOn(mainTest.github, 'getTags').mockImplementation(async (): Promise<string[]> => {
+      return lastTagVersions;
+    });
+    jest.spyOn(mainTest.github, 'pushNewTag').mockImplementation();
+    // Run
+    // Release to Release and patch up v3.0.0 => v3.1.0
+    await mainTest.run();
+    expect(infoMock).toHaveBeenNthCalledWith(3, 'Pushed new tag "v3.1.0" is OK. Work done');
+    expect(setOutputMock).toHaveBeenNthCalledWith(3, 'newtag', 'v3.1.0');
+    expect(setFailedMock).not.toHaveBeenCalled();
+    //
+    releaseType = 'patch';
+    lastTagVersions = ['v3.1.0', 'v3.0.0', 'v3.0.0-rc.12', 'v3.0.0-rc.11', 'v3.0.0-rc.10'];
+    mainTest = new Main(testRootDir);
+    // Empty latest versions in repo
+    jest.spyOn(mainTest.github, 'getTags').mockImplementation(async (): Promise<string[]> => {
+      return lastTagVersions;
+    });
+    jest.spyOn(mainTest.github, 'pushNewTag').mockImplementation();
+    // Run
+    // Release to Release and patch up v3.1.0 => v3.1.1
+    await mainTest.run();
+    expect(infoMock).toHaveBeenNthCalledWith(4, 'Pushed new tag "v3.1.1" is OK. Work done');
+    expect(setOutputMock).toHaveBeenNthCalledWith(4, 'newtag', 'v3.1.1');
+    expect(setFailedMock).not.toHaveBeenCalled();
+  });
+  it('4. Example: Prerelease version with identifier from package.json (develop branch)', async () => {
+    const lastTagVersions: string[] = [];
+    // Action Input
+    getInputMock.mockImplementation((name: string): string => {
+      switch (name) {
+        case 'token':
+          return mockToken;
+        case 'prefix':
+          return 'v';
+        case 'postfix':
+          return 'dev';
+        case 'releasetype':
+        case 'version':
+        case 'metadata':
+        default:
+          return '';
+      }
+    });
+    getBooleanInputMock.mockImplementation((name: string): boolean => {
+      switch (name) {
+        case 'uselasttag':
+        case 'auto':
+        case 'postfixnoup':
+        case 'dryrun':
+        default:
+          return false;
+      }
+    });
+    // Set test root dir
+    const testRootDir: string = normalize(join(cwd(), '__tests__', 'package_version_2.6.3'));
+    // Main instance
+    const mainTest: Main = new Main(testRootDir);
+    // Empty latest versions in repo
+    jest.spyOn(mainTest.github, 'getTags').mockImplementation(async (): Promise<string[]> => {
+      return lastTagVersions;
+    });
+    jest.spyOn(mainTest.github, 'pushNewTag').mockImplementation();
+    // Run
+    await mainTest.run();
+    expect(infoMock).toHaveBeenNthCalledWith(1, 'Pushed new tag "v2.6.3-dev.1" is OK. Work done');
+    expect(setOutputMock).toHaveBeenNthCalledWith(1, 'newtag', 'v2.6.3-dev.1');
+    expect(setFailedMock).not.toHaveBeenCalled();
+  });
+  it('5. Example: Prerelease version no identifier from package.json (develop branch)', async () => {
+    let lastTagVersions: string[] = [];
+    // Action Input
+    getInputMock.mockImplementation((name: string): string => {
+      switch (name) {
+        case 'token':
+          return mockToken;
+        case 'prefix':
+          return 'v';
+        case 'postfix':
+          return 'dev';
+        case 'releasetype':
+        case 'version':
+        case 'metadata':
+        default:
+          return '';
+      }
+    });
+    getBooleanInputMock.mockImplementation((name: string): boolean => {
+      switch (name) {
+        case 'postfixnoup':
+          return true;
+        case 'uselasttag':
+        case 'auto':
+        case 'dryrun':
+        default:
+          return false;
+      }
+    });
+    // Set test root dir
+    const testRootDir: string = normalize(join(cwd(), '__tests__', 'package_version_2.6.3'));
+    // Main instance
+    let mainTest: Main = new Main(testRootDir);
+    // Empty latest versions in repo
+    jest.spyOn(mainTest.github, 'getTags').mockImplementation(async (): Promise<string[]> => {
+      return lastTagVersions;
+    });
+    jest.spyOn(mainTest.github, 'pushNewTag').mockImplementation();
+    // Run
+    await mainTest.run();
+    expect(infoMock).toHaveBeenNthCalledWith(1, 'Pushed new tag "v2.6.3-dev" is OK. Work done');
+    expect(setOutputMock).toHaveBeenNthCalledWith(1, 'newtag', 'v2.6.3-dev');
+    expect(setFailedMock).not.toHaveBeenCalled();
+    //
+    lastTagVersions = ['v2.6.3-dev'];
+    mainTest = new Main(testRootDir);
+    // Empty latest versions in repo
+    jest.spyOn(mainTest.github, 'getTags').mockImplementation(async (): Promise<string[]> => {
+      return lastTagVersions;
+    });
+    jest.spyOn(mainTest.github, 'pushNewTag').mockImplementation();
+    // Run
+    await mainTest.run();
+    expect(setFailedMock).toHaveBeenNthCalledWith(1, 'Tag "v2.6.3-dev" is already exists in repository!!!');
+  });
+  it('6. Example: Prerelease or Release version from package.json + metadata', async () => {
+    const lastTagVersions: string[] = [];
+    const metadataString = 'build101';
+    // Action Input
+    getInputMock.mockImplementation((name: string): string => {
+      switch (name) {
+        case 'token':
+          return mockToken;
+        case 'prefix':
+          return 'v';
+        case 'metadata':
+          return metadataString;
+        case 'postfix':
+        case 'releasetype':
+        case 'version':
+        default:
+          return '';
+      }
+    });
+    getBooleanInputMock.mockImplementation((name: string): boolean => {
+      switch (name) {
+        case 'uselasttag':
+        case 'auto':
+        case 'postfixnoup':
+        case 'dryrun':
+        default:
+          return false;
+      }
+    });
+    // Set test root dir
+    const testRootDir: string = normalize(join(cwd(), '__tests__', 'package_version_2.6.3'));
+    // Main instance
+    let mainTest: Main = new Main(testRootDir);
+    // Empty latest versions in repo
+    jest.spyOn(mainTest.github, 'getTags').mockImplementation(async (): Promise<string[]> => {
+      return lastTagVersions;
+    });
+    jest.spyOn(mainTest.github, 'pushNewTag').mockImplementation();
+    // Run
+    await mainTest.run();
+    expect(infoMock).toHaveBeenNthCalledWith(1, 'Pushed new tag "v2.6.3+build101" is OK. Work done');
+    expect(setOutputMock).toHaveBeenNthCalledWith(1, 'newtag', 'v2.6.3+build101');
+    expect(setFailedMock).not.toHaveBeenCalled();
+    //
+    const metadataBoolean = true;
+    getInputMock.mockImplementation((name: string): string | boolean => {
+      switch (name) {
+        case 'token':
+          return mockToken;
+        case 'prefix':
+          return 'v';
+        case 'metadata':
+          return metadataBoolean;
+        case 'postfix':
+        case 'releasetype':
+        case 'version':
+        default:
+          return '';
+      }
+    });
+    mainTest = new Main(testRootDir);
+    // Empty latest versions in repo
+    jest.spyOn(mainTest.github, 'getTags').mockImplementation(async (): Promise<string[]> => {
+      return lastTagVersions;
+    });
+    jest.spyOn(mainTest.github, 'pushNewTag').mockImplementation();
+    // Run
+    await mainTest.run();
+    expect(infoMock).toHaveBeenNthCalledWith(2, 'Pushed new tag "v2.6.3+649b8949" is OK. Work done');
+    expect(setOutputMock).toHaveBeenNthCalledWith(2, 'newtag', 'v2.6.3+649b8949');
+    expect(setFailedMock).not.toHaveBeenCalled();
+  });
+  it('7. Example: Dry run. No tag push in repository', async () => {
+    const lastTagVersions: string[] = [];
+    // Action Input
+    getInputMock.mockImplementation((name: string): string => {
+      switch (name) {
+        case 'token':
+          return mockToken;
+        case 'prefix':
+          return 'v';
+        case 'postfix':
+        case 'releasetype':
+        case 'version':
+        case 'metadata':
+        default:
+          return '';
+      }
+    });
+    getBooleanInputMock.mockImplementation((name: string): boolean => {
+      switch (name) {
+        case 'dryrun':
+          return true;
+        case 'uselasttag':
+        case 'auto':
+        case 'postfixnoup':
+        default:
+          return false;
+      }
+    });
+    // Set test root dir
+    const testRootDir: string = normalize(join(cwd(), '__tests__', 'package_version_2.6.3'));
+    // Main instance
+    const mainTest: Main = new Main(testRootDir);
+    // Empty latest versions in repo
+    jest.spyOn(mainTest.github, 'getTags').mockImplementation(async (): Promise<string[]> => {
+      return lastTagVersions;
+    });
+    // NO PUSH NEW TAG. ONLY OUTPUT
+    // Run
+    await mainTest.run();
+    expect(infoMock).toHaveBeenNthCalledWith(1, 'Dry Run is enabled. Just output new tag version "v2.6.3" ...');
+    expect(setOutputMock).toHaveBeenNthCalledWith(1, 'newtag', 'v2.6.3');
     expect(setFailedMock).not.toHaveBeenCalled();
   });
 });

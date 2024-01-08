@@ -160,7 +160,7 @@ class Github {
       return message;
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
-      warning(`Error get message from compare commits ${error.message}. Return stub messsage.`);
+      warning(`Error get message from compare commits "${error.message}". Return stub message.`);
       const message = `Version: ${new_tag}`;
       this._message = message;
       return message;
