@@ -32194,7 +32194,7 @@ class Config {
     _inputPostfixNoUpgrade;
     _inputMetadata;
     _dryRun;
-    _autoUpVersion;
+    _inputAutoUpVersion;
     _inputReleaseType;
     _githubSha;
     _githubHeadRef;
@@ -32209,7 +32209,7 @@ class Config {
         this._inputPostfixNoUpgrade = (0, core_1.getBooleanInput)('postfixnoup', { required: false }) ?? false;
         this._inputMetadata = (0, core_1.getInput)('metadata', { required: false });
         this._inputReleaseType = (0, core_1.getInput)('releasetype', { required: false });
-        this._autoUpVersion = (0, core_1.getBooleanInput)('auto', { required: false }) ?? false;
+        this._inputAutoUpVersion = (0, core_1.getBooleanInput)('auto', { required: false }) ?? false;
         this._dryRun = (0, core_1.getBooleanInput)('dryrun', { required: false }) ?? false;
         this.packageJsonData = this._inputVersion !== undefined && this._inputVersion !== '' ? null : this.getPackageData();
         this._githubSha = this.setGithabSha(process.env.GITHUB_SHA);
@@ -32259,7 +32259,7 @@ class Config {
         return this._dryRun;
     }
     get autoUp() {
-        return this._autoUpVersion;
+        return this._inputAutoUpVersion;
     }
     get githubSha() {
         return this._githubSha;
