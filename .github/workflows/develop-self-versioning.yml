@@ -11,7 +11,7 @@ permissions:
 
 jobs:
   develop-version:
-    name: GitHub Actions Test
+    name: Develop Self Versioning
     runs-on: ubuntu-latest
 
     steps:

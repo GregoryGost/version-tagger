@@ -379,7 +379,7 @@ describe('github.ts', () => {
     expect(setFailedMock).toHaveBeenNthCalledWith(1, `Cannot read properties of undefined (reading 'rest')`);
     expect(warningMock).toHaveBeenNthCalledWith(
       1,
-      `Error get message from compare commits Cannot read properties of undefined (reading 'rest'). Return stub messsage.`
+      `Error get message from compare commits "Cannot read properties of undefined (reading 'rest')". Return stub message.`
     );
   });
 });

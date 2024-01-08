@@ -71,7 +71,7 @@ class Config {
    */
   private readonly _dryRun: boolean;
   /**
-   * `OPTIONAL` Whether to automatically upgrade the version regardless of the committed version in the file.
+   * `OPTIONAL` Forced version update. May be incorrect because in some cases duplicates the version upgrade.
    * DANGEROUS!!! The version in the file may not match what will be in the tags as a result.
    * If `FALSE`, no automatic promotions will be made.
    * Default: `false`
