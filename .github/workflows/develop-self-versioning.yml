@@ -1,7 +1,6 @@
 name: Develop Self Versioning
 
 on:
-  pull_request:
   push:
     branches:
       - develop
