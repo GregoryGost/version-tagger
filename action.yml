@@ -1,5 +1,5 @@
 name: 'Version Tagger'
-description: 'GitHub action to automate versioning management. Both major and development versions'
+description: 'GitHub Action to automate tag-based version control. For both production and development.'
 author: 'GregoryGost'
 
 branding:

@@ -12,6 +12,7 @@ permissions:
 
 jobs:
   develop-version:
+    if: github.event.pull_request.merged == true
     name: Main Self Versioning
     runs-on: ubuntu-latest
 
