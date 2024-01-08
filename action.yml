@@ -11,12 +11,13 @@ inputs:
     description: 'The GitHub Token to use for reference management in the repo'
     required: true
   version:
-    description: 'Version from previous action output. Pattern semver https://semver.org/: `0.0.0`'
+    description: 'Version from previous action output. Pattern semver https://semver.org/: `x.y.z`'
     required: false
   uselasttag:
     description:
       'Use latest available tag as source version. Applies the latest available tag received from the repository for the
-      source version. If there are no available tags, it takes the version from the `package.json` file'
+      source version. If there are no available tags, it takes the version from the base logic: `package.json` file or
+      default version `0.1.0`'
     required: false
     default: false
   prefix:
@@ -44,9 +45,9 @@ inputs:
     required: false
   auto:
     description:
-      'Used in conjunction with a `releasetype` parameter. Whether to automatically upgrade the version regardless of
-      the committed version in the file. DANGEROUS!!! The version in the file may not match what will be in the tags as
-      a result. If `FALSE`, no automatic promotions will be made.'
+      'Forced version update. DANGEROUS-1!!! May be incorrect because in some cases duplicates the version upgrade.
+      DANGEROUS-2!!! The version in the file may not match what will be in the tags as a result. If `FALSE`, no
+      automatic promotions will be made.'
     required: false
     default: false
   dryrun:

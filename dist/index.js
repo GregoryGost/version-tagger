@@ -32194,7 +32194,7 @@ class Config {
     _inputPostfixNoUpgrade;
     _inputMetadata;
     _dryRun;
-    _autoUpVersion;
+    _inputAutoUpVersion;
     _inputReleaseType;
     _githubSha;
     _githubHeadRef;
@@ -32209,7 +32209,7 @@ class Config {
         this._inputPostfixNoUpgrade = (0, core_1.getBooleanInput)('postfixnoup', { required: false }) ?? false;
         this._inputMetadata = (0, core_1.getInput)('metadata', { required: false });
         this._inputReleaseType = (0, core_1.getInput)('releasetype', { required: false });
-        this._autoUpVersion = (0, core_1.getBooleanInput)('auto', { required: false }) ?? false;
+        this._inputAutoUpVersion = (0, core_1.getBooleanInput)('auto', { required: false }) ?? false;
         this._dryRun = (0, core_1.getBooleanInput)('dryrun', { required: false }) ?? false;
         this.packageJsonData = this._inputVersion !== undefined && this._inputVersion !== '' ? null : this.getPackageData();
         this._githubSha = this.setGithabSha(process.env.GITHUB_SHA);
@@ -32259,7 +32259,7 @@ class Config {
         return this._dryRun;
     }
     get autoUp() {
-        return this._autoUpVersion;
+        return this._inputAutoUpVersion;
     }
     get githubSha() {
         return this._githubSha;
@@ -32398,7 +32398,7 @@ class Github {
             return message;
         }
         catch (error) {
-            (0, core_1.warning)(`Error get message from compare commits ${error.message}. Return stub messsage.`);
+            (0, core_1.warning)(`Error get message from compare commits "${error.message}". Return stub message.`);
             const message = `Version: ${new_tag}`;
             this._message = message;
             return message;
@@ -32442,7 +32442,7 @@ class Main {
             }
             const tagBuilder = new tag_1.Tag(this._config.version, this._config.useLastTag === false ? (repoTags.length > 0 ? repoTags[0] : null) : null, this._config.prefix, this._config.postfix, this._config.postfixNoUpgrade, this._config.metadata, this._config.releaseType, this._config.autoUp);
             const newTag = tagBuilder.buildNewTag();
-            if (repoTags && repoTags.length > 0 && this._config.autoUp) {
+            if (repoTags && repoTags.length > 0) {
                 if (repoTags.includes(newTag))
                     throw new Error(`Tag "${newTag}" is already exists in repository!!!`);
             }
@@ -32517,18 +32517,16 @@ class Tag {
                 if (versionMatch !== null)
                     this.postfixPatchFrieze = String(versionMatch[3]);
             }
-            if (this.auto === true) {
-                if (this.releaseType !== null && this.releaseType !== '') {
-                    const newVersion = (0, semver_1.inc)(version, this.releaseType);
-                    if (newVersion !== null) {
-                        return newVersion;
+            if (this.releaseType !== null && this.releaseType !== '') {
+                const updatedVersion = (0, semver_1.inc)(version, this.releaseType);
+                if (updatedVersion !== null) {
+                    if (this.auto && this.postfix === null) {
+                        const upVersion = (0, semver_1.inc)(updatedVersion, this.releaseType);
+                        if (upVersion !== null) {
+                            return upVersion;
+                        }
                     }
-                }
-            }
-            else if (this.releaseType === 'patch') {
-                const newVersion = (0, semver_1.inc)(version, this.releaseType);
-                if (newVersion !== null) {
-                    return newVersion;
+                    return updatedVersion;
                 }
             }
             return version;

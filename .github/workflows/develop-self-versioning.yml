@@ -1,0 +1,28 @@
+name: Develop Self Versioning
+
+on:
+  pull_request:
+  push:
+    branches:
+      - develop
+
+permissions:
+  contents: write
+
+jobs:
+  develop-version:
+    name: Develop Self Versioning
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        id: checkout
+        uses: actions/checkout@v4
+
+      - name: New Version
+        id: new-version
+        uses: ./
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          prefix: 'v'
+          postfix: 'dev'

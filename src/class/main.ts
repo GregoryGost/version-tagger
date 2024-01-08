@@ -65,8 +65,7 @@ class Main {
       );
       const newTag: string = tagBuilder.buildNewTag();
       // check new tag is exists in repo (=> failed)
-      // if inputVersion OR autoUp
-      if (repoTags && repoTags.length > 0 && this._config.autoUp) {
+      if (repoTags && repoTags.length > 0) {
         if (repoTags.includes(newTag)) throw new Error(`Tag "${newTag}" is already exists in repository!!!`);
       }
       // if dry run - only output

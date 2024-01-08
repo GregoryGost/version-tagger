@@ -71,14 +71,15 @@ class Config {
    */
   private readonly _dryRun: boolean;
   /**
-   * `OPTIONAL` Whether to automatically upgrade the version regardless of the committed version in the file.
-   * DANGEROUS!!! The version in the file may not match what will be in the tags as a result.
+   * `OPTIONAL` Forced version update.
+   * DANGEROUS-1!!! May be incorrect because in some cases duplicates the version upgrade.
+   * DANGEROUS-2!!! The version in the file may not match what will be in the tags as a result.
    * If `FALSE`, no automatic promotions will be made.
    * Default: `false`
    */
-  private readonly _autoUpVersion: boolean;
+  private readonly _inputAutoUpVersion: boolean;
   /**
-   * Release type version.
+   * `OPTIONAL` Release type version.
    * `major`(X.y.z) or `minor`(x.Y.z) or `patch`(x.y.Z).
    * All variants: `major`, `premajor`, `minor`, `preminor`, `patch`, `prepatch`, `prerelease`.
    * If not specified, then no version will be incremented.
@@ -118,7 +119,7 @@ class Config {
     this._inputPostfixNoUpgrade = getBooleanInput('postfixnoup', { required: false }) ?? false;
     this._inputMetadata = getInput('metadata', { required: false });
     this._inputReleaseType = getInput('releasetype', { required: false }) as ReleaseTypeT;
-    this._autoUpVersion = getBooleanInput('auto', { required: false }) ?? false;
+    this._inputAutoUpVersion = getBooleanInput('auto', { required: false }) ?? false;
     this._dryRun = getBooleanInput('dryrun', { required: false }) ?? false;
     //
     this.packageJsonData = this._inputVersion !== undefined && this._inputVersion !== '' ? null : this.getPackageData();
@@ -219,12 +220,11 @@ class Config {
 
   /**
    * Get Auto up version from Github Action Inputs.
-   * If `true`, then the version upgrade mechanism will be applied without taking into account the dependence
-   * on the source file (if it was applied)
+   * If true, the version will be forcibly upgraded again. Use may result in double upgrade. Use with caution!
    * @returns {boolean} Auto up version flag. Default: `false`
    */
   get autoUp(): boolean {
-    return this._autoUpVersion;
+    return this._inputAutoUpVersion;
   }
 
   /**
