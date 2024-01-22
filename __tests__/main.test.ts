@@ -18,6 +18,8 @@ const mockReleasetype = '';
 const mockAuto = false;
 const mockDryrun = true;
 
+const defaultRootDir: string = normalize(join(cwd(), '__tests__', 'package_version_default'));
+
 process.env.GITHUB_EVENT_PATH = join(__dirname, 'github_payload.json');
 process.env.GITHUB_REPOSITORY = 'GregoryGost/version-tagger';
 process.env.GITHUB_SHA = 'c3d0be41ecbe669545ee3e94d31ed9a4bc91ee3c';
@@ -107,7 +109,7 @@ describe('main.ts', () => {
       }
     });
     // Tag is already exists
-    const mainTest: Main = new Main();
+    const mainTest: Main = new Main(defaultRootDir);
     jest.spyOn(mainTest.github, 'getTags').mockImplementation(async (): Promise<string[]> => {
       return ['v1.0.0-rc.1', 'v1.0.0-rc.2'];
     });
@@ -116,9 +118,53 @@ describe('main.ts', () => {
     // });
     await mainTest.run();
     expect(setFailedMock).toHaveBeenNthCalledWith(1, `Tag "v1.0.0-rc.2" is already exists in repository!!!`);
+    //
+    //
+    getInputMock.mockImplementation((name: string): string => {
+      switch (name) {
+        case 'token':
+          return mockToken;
+        case 'prefix':
+          return 'v';
+        case 'postfix':
+          return 'dev';
+        case 'version':
+        case 'metadata':
+        case 'releasetype':
+        default:
+          return '';
+      }
+    });
+    getBooleanInputMock.mockImplementation((name: string): boolean => {
+      switch (name) {
+        case 'postfixnoup':
+        case 'auto':
+        case 'dryrun':
+        default:
+          return false;
+      }
+    });
+    const mainTest_2: Main = new Main(defaultRootDir);
+    jest.spyOn(mainTest_2.github, 'getTags').mockImplementation(async (): Promise<string[]> => {
+      return [
+        'v1.0.0',
+        'v1.0.0-dev.11',
+        'v1.0.0-dev.10',
+        'v1.0.0-dev.9',
+        'v1.0.0-dev.8',
+        'v1.0.0-dev.7',
+        'v1.0.0-dev.6',
+        'v1.0.0-dev.5',
+        'v1.0.0-dev.4',
+        'v1.0.0-dev.2',
+        'v1.0.0-dev.1'
+      ];
+    });
+    await mainTest_2.run();
+    expect(setFailedMock).toHaveBeenNthCalledWith(2, `Tag "v1.0.0-dev.1" is already exists in repository!!!`);
   });
   it('main run ok. dryrun = true', async () => {
-    let mainTest: Main = new Main();
+    let mainTest: Main = new Main(defaultRootDir);
     // No legacy tags
     // Empty version
     jest.spyOn(mainTest.github, 'getTags').mockImplementation(async (): Promise<string[]> => {
@@ -150,7 +196,7 @@ describe('main.ts', () => {
           return '';
       }
     });
-    mainTest = new Main();
+    mainTest = new Main(defaultRootDir);
     jest.spyOn(mainTest.github, 'getTags').mockImplementation(async (): Promise<string[]> => {
       return [''];
     });
@@ -171,7 +217,7 @@ describe('main.ts', () => {
           return false;
       }
     });
-    const mainTest: Main = new Main();
+    const mainTest: Main = new Main(defaultRootDir);
     jest.spyOn(mainTest.github, 'getTags').mockImplementation(async (): Promise<string[]> => {
       return [''];
     });
