@@ -1,6 +1,6 @@
 {
   "name": "@gregory-gost/version-tagger",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "GitHub Action to automate tag-based version control. For both production and development.",
   "license": "GPL-3",
   "private": true,
@@ -80,7 +80,7 @@
   "dependencies": {
     "@actions/core": "1.10.1",
     "@actions/github": "6.0.0",
-    "semver": "7.5.4"
+    "semver": "7.6.0"
   },
   "devDependencies": {
     "@octokit/plugin-rest-endpoint-methods": "10.2.0",
