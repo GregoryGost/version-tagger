@@ -12,6 +12,7 @@ import { Config } from '../src/class/config';
 
 const mockToken =
   'oBgGDgMmhwHAwxJaqBZzImWeypnYKWwQSGtvtYxhNzzYomNINkLaOHAVFCNwtOgXSbuiBeZuaMLIhDNUwVzeoTfQUyoLYLzROcNXJFiwRGZLzYBgVhwYkZMgGxFmvcsTqtHHADnlQjkQBwRPjraMMWvEersLQIJT';
+const defaultRootDir: string = normalize(join(cwd(), '__tests__', 'package_version_default'));
 
 // Mock the GitHub Actions core library
 let getInputMock: jest.SpyInstance;
@@ -99,7 +100,7 @@ describe('config.ts', () => {
           return false;
       }
     });
-    const config: Config = new Config();
+    const config: Config = new Config(defaultRootDir);
     expect(config.version).toBe('1.0.0');
     config.version = '1.5.6';
     expect(config.version).toBe('1.5.6');
