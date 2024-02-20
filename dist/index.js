@@ -1215,7 +1215,7 @@ const Context = __importStar(__nccwpck_require__(8282));
 const Utils = __importStar(__nccwpck_require__(1181));
 // octokit + plugins
 const core_1 = __nccwpck_require__(807);
-const plugin_rest_endpoint_methods_1 = __nccwpck_require__(5269);
+const plugin_rest_endpoint_methods_1 = __nccwpck_require__(6294);
 const plugin_paginate_rest_1 = __nccwpck_require__(9906);
 exports.context = new Context.Context();
 const baseUrl = Utils.getApiBaseUrl();
@@ -3282,7 +3282,7 @@ paginateRest.VERSION = VERSION;
 
 /***/ }),
 
-/***/ 5269:
+/***/ 6294:
 /***/ ((module) => {
 
 "use strict";
@@ -3314,7 +3314,7 @@ __export(dist_src_exports, {
 module.exports = __toCommonJS(dist_src_exports);
 
 // pkg/dist-src/version.js
-var VERSION = "10.2.0";
+var VERSION = "10.3.0";
 
 // pkg/dist-src/generated/endpoints.js
 var Endpoints = {
@@ -3441,6 +3441,9 @@ var Endpoints = {
       "GET /repos/{owner}/{repo}/actions/permissions/selected-actions"
     ],
     getArtifact: ["GET /repos/{owner}/{repo}/actions/artifacts/{artifact_id}"],
+    getCustomOidcSubClaimForRepo: [
+      "GET /repos/{owner}/{repo}/actions/oidc/customization/sub"
+    ],
     getEnvironmentPublicKey: [
       "GET /repositories/{repository_id}/environments/{environment_name}/secrets/public-key"
     ],
@@ -3592,6 +3595,9 @@ var Endpoints = {
     ],
     setCustomLabelsForSelfHostedRunnerForRepo: [
       "PUT /repos/{owner}/{repo}/actions/runners/{runner_id}/labels"
+    ],
+    setCustomOidcSubClaimForRepo: [
+      "PUT /repos/{owner}/{repo}/actions/oidc/customization/sub"
     ],
     setGithubActionsDefaultWorkflowPermissionsOrganization: [
       "PUT /orgs/{org}/actions/permissions/workflow"
@@ -4252,6 +4258,14 @@ var Endpoints = {
       {
         deprecated: "octokit.rest.migrations.updateImport() is deprecated, see https://docs.github.com/rest/migrations/source-imports#update-an-import"
       }
+    ]
+  },
+  oidc: {
+    getOidcCustomSubTemplateForOrg: [
+      "GET /orgs/{org}/actions/oidc/customization/sub"
+    ],
+    updateOidcCustomSubTemplateForOrg: [
+      "PUT /orgs/{org}/actions/oidc/customization/sub"
     ]
   },
   orgs: {
