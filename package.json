@@ -31,7 +31,7 @@
   "exports": {
     ".": "./dist/index.js"
   },
-  "packageManager": "pnpm@8.14.1",
+  "packageManager": "pnpm@8.15.4",
   "engines": {
     "node": ">=20"
   },
@@ -83,7 +83,7 @@
     "semver": "7.6.0"
   },
   "devDependencies": {
-    "@octokit/plugin-rest-endpoint-methods": "10.3.0",
+    "@octokit/plugin-rest-endpoint-methods": "11.0.0",
     "@octokit/types": "12.6.0",
     "@types/jest": "29.5.12",
     "@types/node": "20.11.20",
