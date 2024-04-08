@@ -17,8 +17,8 @@ dependencies:
 
 devDependencies:
   '@octokit/plugin-rest-endpoint-methods':
-    specifier: 11.0.1
-    version: 11.0.1(@octokit/core@6.1.1)
+    specifier: 12.2.0
+    version: 12.2.0(@octokit/core@6.1.1)
   '@octokit/types':
     specifier: 12.6.0
     version: 12.6.0
@@ -895,14 +895,14 @@ packages:
       '@octokit/types': 12.6.0
     dev: false
 
-  /@octokit/plugin-rest-endpoint-methods@11.0.1(@octokit/core@6.1.1):
-    resolution: {integrity: sha512-OcuMW0Ftkhad14vPfE0pK7uQK9qzvIZUvcMy71GZOAqlE39hvPwOUz4ylCPgr4YUVdFUc7bY8SjdcG1r8dVGDA==}
+  /@octokit/plugin-rest-endpoint-methods@12.2.0(@octokit/core@6.1.1):
+    resolution: {integrity: sha512-pedYlTRKpOVfdhRynGlvdlc5otxlKRveWQFsDWeyM+nuyYYKyTxUfLGCRBgfg3DJrCCtnUIvwhFEBsDTnGiz6A==}
     engines: {node: '>= 18'}
     peerDependencies:
       '@octokit/core': '>=6'
     dependencies:
       '@octokit/core': 6.1.1
-      '@octokit/types': 12.6.0
+      '@octokit/types': 13.1.0
     dev: true
 
   /@octokit/request-error@5.0.1:
