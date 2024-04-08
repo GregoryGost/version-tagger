@@ -86,10 +86,10 @@
     "@octokit/plugin-rest-endpoint-methods": "11.0.1",
     "@octokit/types": "12.6.0",
     "@types/jest": "29.5.12",
-    "@types/node": "20.12.2",
+    "@types/node": "20.12.5",
     "@types/semver": "7.5.8",
-    "@typescript-eslint/eslint-plugin": "7.4.0",
-    "@typescript-eslint/parser": "7.4.0",
+    "@typescript-eslint/eslint-plugin": "7.6.0",
+    "@typescript-eslint/parser": "7.6.0",
     "@vercel/ncc": "0.38.1",
     "eslint": "8.57.0",
     "eslint-plugin-github": "4.10.2",
@@ -101,7 +101,7 @@
     "prettier": "3.2.5",
     "prettier-eslint": "16.3.0",
     "ts-jest": "29.1.2",
-    "type-fest": "4.14.0",
-    "typescript": "5.4.3"
+    "type-fest": "4.15.0",
+    "typescript": "5.4.4"
   }
 }
