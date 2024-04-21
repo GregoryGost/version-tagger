@@ -32206,6 +32206,7 @@ try {
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.Config = void 0;
+const node_process_1 = __nccwpck_require__(7742);
 const node_url_1 = __nccwpck_require__(1041);
 const node_path_1 = __nccwpck_require__(9411);
 const node_fs_1 = __nccwpck_require__(7561);
@@ -32227,7 +32228,7 @@ class Config {
     _githubHeadRef;
     _inputUseLastTag;
     constructor(root_path) {
-        this.rootPath = root_path ?? Config.getRootDir();
+        this.rootPath = root_path ?? this.getRootDir();
         this._inputToken = (0, core_1.getInput)('token', { required: true });
         this._inputVersion = (0, core_1.getInput)('version', { required: false });
         this._inputUseLastTag = (0, core_1.getBooleanInput)('uselasttag', { required: false }) ?? false;
@@ -32297,7 +32298,12 @@ class Config {
     get useLastTag() {
         return this._inputUseLastTag;
     }
-    static getRootDir() {
+    getRootDir() {
+        if (node_process_1.env.GITHUB_WORKSPACE !== undefined && node_process_1.env.GITHUB_WORKSPACE !== '') {
+            const finalCurrentDir = (0, node_path_1.normalize)(node_process_1.env.GITHUB_WORKSPACE);
+            (0, core_1.info)(`Root directory: ${finalCurrentDir}`);
+            return finalCurrentDir;
+        }
         const filename = (0, node_url_1.fileURLToPath)((0, node_url_1.pathToFileURL)(__filename).toString());
         const dir = (0, node_path_1.dirname)(filename);
         let currentDir = dir;
@@ -32739,6 +32745,14 @@ module.exports = require("node:fs");
 
 "use strict";
 module.exports = require("node:path");
+
+/***/ }),
+
+/***/ 7742:
+/***/ ((module) => {
+
+"use strict";
+module.exports = require("node:process");
 
 /***/ }),
 

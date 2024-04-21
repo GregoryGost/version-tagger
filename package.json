@@ -1,6 +1,6 @@
 {
   "name": "@gregory-gost/version-tagger",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "GitHub Action to automate tag-based version control. For both production and development.",
   "license": "GPL-3",
   "private": true,

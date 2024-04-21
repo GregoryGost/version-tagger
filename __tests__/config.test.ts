@@ -26,6 +26,7 @@ describe('config.ts', () => {
     //
     process.env.GITHUB_SHA = 'c3d0be41ecbe669545ee3e94d31ed9a4bc91ee3c';
     process.env.GITHUB_HEAD_REF = 'develop';
+    process.env.GITHUB_WORKSPACE = '';
     //
     setFailedMock = jest.spyOn(core, 'setFailed').mockImplementation();
     getInputMock = jest.spyOn(core, 'getInput').mockImplementation();
@@ -54,6 +55,13 @@ describe('config.ts', () => {
   it('get root path', async () => {
     const config: Config = new Config();
     const currentDir: string = normalize(cwd());
+    expect(config.root).toBe(currentDir);
+    expect(infoMock).toHaveBeenNthCalledWith(1, `Root directory: ${currentDir}`);
+  });
+  it('get root path with GITHUB_WORKSPACE env', async () => {
+    const currentDir: string = normalize(cwd());
+    process.env.GITHUB_WORKSPACE = currentDir;
+    const config: Config = new Config();
     expect(config.root).toBe(currentDir);
     expect(infoMock).toHaveBeenNthCalledWith(1, `Root directory: ${currentDir}`);
   });
