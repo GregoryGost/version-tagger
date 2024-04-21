@@ -13,6 +13,7 @@ describe('tag.ts', () => {
     jest.clearAllMocks();
     //
     setFailedMock = jest.spyOn(core, 'setFailed').mockImplementation();
+    jest.spyOn(core, 'info').mockImplementation();
   });
   /**
    * Instance test

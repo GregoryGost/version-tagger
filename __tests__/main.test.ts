@@ -18,6 +18,8 @@ const mockReleasetype = '';
 const mockAuto = false;
 const mockDryrun = true;
 
+const defaultRootDir: string = normalize(join(cwd(), '__tests__', 'package_version_default'));
+
 process.env.GITHUB_EVENT_PATH = join(__dirname, 'github_payload.json');
 process.env.GITHUB_REPOSITORY = 'GregoryGost/version-tagger';
 process.env.GITHUB_SHA = 'c3d0be41ecbe669545ee3e94d31ed9a4bc91ee3c';
@@ -107,7 +109,7 @@ describe('main.ts', () => {
       }
     });
     // Tag is already exists
-    const mainTest: Main = new Main();
+    const mainTest: Main = new Main(defaultRootDir);
     jest.spyOn(mainTest.github, 'getTags').mockImplementation(async (): Promise<string[]> => {
       return ['v1.0.0-rc.1', 'v1.0.0-rc.2'];
     });
@@ -116,9 +118,53 @@ describe('main.ts', () => {
     // });
     await mainTest.run();
     expect(setFailedMock).toHaveBeenNthCalledWith(1, `Tag "v1.0.0-rc.2" is already exists in repository!!!`);
+    //
+    //
+    getInputMock.mockImplementation((name: string): string => {
+      switch (name) {
+        case 'token':
+          return mockToken;
+        case 'prefix':
+          return 'v';
+        case 'postfix':
+          return 'dev';
+        case 'version':
+        case 'metadata':
+        case 'releasetype':
+        default:
+          return '';
+      }
+    });
+    getBooleanInputMock.mockImplementation((name: string): boolean => {
+      switch (name) {
+        case 'postfixnoup':
+        case 'auto':
+        case 'dryrun':
+        default:
+          return false;
+      }
+    });
+    const mainTest_2: Main = new Main(defaultRootDir);
+    jest.spyOn(mainTest_2.github, 'getTags').mockImplementation(async (): Promise<string[]> => {
+      return [
+        'v1.0.0',
+        'v1.0.0-dev.11',
+        'v1.0.0-dev.10',
+        'v1.0.0-dev.9',
+        'v1.0.0-dev.8',
+        'v1.0.0-dev.7',
+        'v1.0.0-dev.6',
+        'v1.0.0-dev.5',
+        'v1.0.0-dev.4',
+        'v1.0.0-dev.2',
+        'v1.0.0-dev.1'
+      ];
+    });
+    await mainTest_2.run();
+    expect(setFailedMock).toHaveBeenNthCalledWith(2, `Tag "v1.0.0-dev.1" is already exists in repository!!!`);
   });
   it('main run ok. dryrun = true', async () => {
-    let mainTest: Main = new Main();
+    let mainTest: Main = new Main(defaultRootDir);
     // No legacy tags
     // Empty version
     jest.spyOn(mainTest.github, 'getTags').mockImplementation(async (): Promise<string[]> => {
@@ -128,7 +174,7 @@ describe('main.ts', () => {
     //   return 'v1.0.0-rc.1';
     // });
     await mainTest.run();
-    expect(infoMock).toHaveBeenNthCalledWith(1, 'Dry Run is enabled. Just output new tag version "v1.0.0-rc.1" ...');
+    expect(infoMock).toHaveBeenNthCalledWith(2, 'Dry Run is enabled. Just output new tag version "v1.0.0-rc.1" ...');
     expect(setOutputMock).toHaveBeenNthCalledWith(1, 'newtag', 'v1.0.0-rc.1');
     expect(setFailedMock).not.toHaveBeenCalled();
     // Input Custom Version
@@ -150,7 +196,7 @@ describe('main.ts', () => {
           return '';
       }
     });
-    mainTest = new Main();
+    mainTest = new Main(defaultRootDir);
     jest.spyOn(mainTest.github, 'getTags').mockImplementation(async (): Promise<string[]> => {
       return [''];
     });
@@ -171,13 +217,13 @@ describe('main.ts', () => {
           return false;
       }
     });
-    const mainTest: Main = new Main();
+    const mainTest: Main = new Main(defaultRootDir);
     jest.spyOn(mainTest.github, 'getTags').mockImplementation(async (): Promise<string[]> => {
       return [''];
     });
     jest.spyOn(mainTest.github, 'pushNewTag').mockImplementation();
     await mainTest.run();
-    expect(infoMock).toHaveBeenNthCalledWith(1, 'Pushed new tag "v1.0.0-rc.1" is OK. Work done');
+    expect(infoMock).toHaveBeenNthCalledWith(2, 'Pushed new tag "v1.0.0-rc.1" is OK. Work done');
     expect(setOutputMock).toHaveBeenNthCalledWith(1, 'newtag', 'v1.0.0-rc.1');
     expect(setFailedMock).not.toHaveBeenCalled();
   });
@@ -233,7 +279,7 @@ describe('main.ts', () => {
     expect(mainTest.config.dryRun).toBe(false);
     // Run
     await mainTest.run();
-    expect(infoMock).toHaveBeenNthCalledWith(1, 'Pushed new tag "v2.6.3" is OK. Work done');
+    expect(infoMock).toHaveBeenNthCalledWith(2, 'Pushed new tag "v2.6.3" is OK. Work done');
     expect(setOutputMock).toHaveBeenNthCalledWith(1, 'newtag', 'v2.6.3');
     expect(setFailedMock).not.toHaveBeenCalled();
   });
@@ -290,7 +336,7 @@ describe('main.ts', () => {
     expect(mainTest.config.dryRun).toBe(false);
     // Run
     await mainTest.run();
-    expect(infoMock).toHaveBeenNthCalledWith(1, 'Pushed new tag "v2.6.4" is OK. Work done');
+    expect(infoMock).toHaveBeenNthCalledWith(2, 'Pushed new tag "v2.6.4" is OK. Work done');
     expect(setOutputMock).toHaveBeenNthCalledWith(1, 'newtag', 'v2.6.4');
     expect(setFailedMock).not.toHaveBeenCalled();
   });
@@ -347,7 +393,7 @@ describe('main.ts', () => {
     expect(mainTest.config.dryRun).toBe(false);
     // Run
     await mainTest.run();
-    expect(infoMock).toHaveBeenNthCalledWith(1, 'Pushed new tag "v2.7.0" is OK. Work done');
+    expect(infoMock).toHaveBeenNthCalledWith(2, 'Pushed new tag "v2.7.0" is OK. Work done');
     expect(setOutputMock).toHaveBeenNthCalledWith(1, 'newtag', 'v2.7.0');
     expect(setFailedMock).not.toHaveBeenCalled();
   });
@@ -404,7 +450,7 @@ describe('main.ts', () => {
     expect(mainTest.config.dryRun).toBe(false);
     // Run
     await mainTest.run();
-    expect(infoMock).toHaveBeenNthCalledWith(1, 'Pushed new tag "v3.0.0" is OK. Work done');
+    expect(infoMock).toHaveBeenNthCalledWith(2, 'Pushed new tag "v3.0.0" is OK. Work done');
     expect(setOutputMock).toHaveBeenNthCalledWith(1, 'newtag', 'v3.0.0');
     expect(setFailedMock).not.toHaveBeenCalled();
   });
@@ -461,7 +507,7 @@ describe('main.ts', () => {
     expect(mainTest.config.dryRun).toBe(false);
     // Run
     await mainTest.run();
-    expect(infoMock).toHaveBeenNthCalledWith(1, 'Pushed new tag "v2.6.3-rc.1" is OK. Work done');
+    expect(infoMock).toHaveBeenNthCalledWith(2, 'Pushed new tag "v2.6.3-rc.1" is OK. Work done');
     expect(setOutputMock).toHaveBeenNthCalledWith(1, 'newtag', 'v2.6.3-rc.1');
     expect(setFailedMock).not.toHaveBeenCalled();
   });
@@ -514,7 +560,7 @@ describe('main.ts', () => {
     expect(mainTest.config.dryRun).toBe(false);
     // Run
     await mainTest.run();
-    expect(infoMock).toHaveBeenNthCalledWith(1, 'Pushed new tag "v2.6.3-rc.1" is OK. Work done');
+    expect(infoMock).toHaveBeenNthCalledWith(2, 'Pushed new tag "v2.6.3-rc.1" is OK. Work done');
     expect(setOutputMock).toHaveBeenNthCalledWith(1, 'newtag', 'v2.6.3-rc.1');
     expect(setFailedMock).not.toHaveBeenCalled();
   });
@@ -573,14 +619,14 @@ describe('main.ts', () => {
     // Run
     await mainTest.run();
     expect(mainTest.config.version).toBe('v5.6.4-rc.1'); // after get from last repo tag
-    expect(infoMock).toHaveBeenNthCalledWith(1, 'Pushed new tag "v5.6.4-rc.2" is OK. Work done');
+    expect(infoMock).toHaveBeenNthCalledWith(2, 'Pushed new tag "v5.6.4-rc.2" is OK. Work done');
     expect(setOutputMock).toHaveBeenNthCalledWith(1, 'newtag', 'v5.6.4-rc.2');
     expect(setFailedMock).not.toHaveBeenCalled();
     // Next Run
     lastTagVersions = ['v5.6.4-rc.2', 'v5.6.4-rc.1', 'v2.5.0'];
     await mainTest.run();
     expect(mainTest.config.version).toBe('v5.6.4-rc.2'); // after get from last repo tag
-    expect(infoMock).toHaveBeenNthCalledWith(2, 'Pushed new tag "v5.6.4-rc.3" is OK. Work done');
+    expect(infoMock).toHaveBeenNthCalledWith(4, 'Pushed new tag "v5.6.4-rc.3" is OK. Work done');
     expect(setOutputMock).toHaveBeenNthCalledWith(2, 'newtag', 'v5.6.4-rc.3');
     expect(setFailedMock).not.toHaveBeenCalled();
   });
@@ -640,7 +686,7 @@ describe('main.ts', () => {
     // Run
     await mainTest.run();
     expect(mainTest.config.version).toBe('v4.4.4-rc.12'); // after get from last repo tag
-    expect(infoMock).toHaveBeenNthCalledWith(1, 'Pushed new tag "v4.5.0" is OK. Work done');
+    expect(infoMock).toHaveBeenNthCalledWith(2, 'Pushed new tag "v4.5.0" is OK. Work done');
     expect(setOutputMock).toHaveBeenNthCalledWith(1, 'newtag', 'v4.5.0');
     expect(setFailedMock).not.toHaveBeenCalled();
   });
@@ -700,7 +746,7 @@ describe('main.ts', () => {
     // Run
     await mainTest.run();
     expect(mainTest.config.version).toBe('v4.4.4-rc.12'); // after get from last repo tag
-    expect(infoMock).toHaveBeenNthCalledWith(1, 'Pushed new tag "v4.4.4" is OK. Work done');
+    expect(infoMock).toHaveBeenNthCalledWith(2, 'Pushed new tag "v4.4.4" is OK. Work done');
     expect(setOutputMock).toHaveBeenNthCalledWith(1, 'newtag', 'v4.4.4');
     expect(setFailedMock).not.toHaveBeenCalled();
   });
@@ -763,7 +809,7 @@ describe('main.ts', () => {
     // Run
     await mainTest.run();
     expect(mainTest.config.version).toBe('0.1.0'); // after get from last repo tag
-    expect(infoMock).toHaveBeenNthCalledWith(1, 'Pushed new tag "v0.1.0-beta.1" is OK. Work done');
+    expect(infoMock).toHaveBeenNthCalledWith(2, 'Pushed new tag "v0.1.0-beta.1" is OK. Work done');
     expect(setOutputMock).toHaveBeenNthCalledWith(1, 'newtag', 'v0.1.0-beta.1');
     expect(setFailedMock).not.toHaveBeenCalled();
     //
@@ -772,14 +818,14 @@ describe('main.ts', () => {
     lastTagVersions = ['v0.1.0-beta.1'];
     await mainTest.run();
     expect(mainTest.config.version).toBe('v0.1.0-beta.1'); // after get from last repo tag
-    expect(infoMock).toHaveBeenNthCalledWith(2, 'Pushed new tag "v0.1.0-beta.2" is OK. Work done');
+    expect(infoMock).toHaveBeenNthCalledWith(4, 'Pushed new tag "v0.1.0-beta.2" is OK. Work done');
     expect(setOutputMock).toHaveBeenNthCalledWith(2, 'newtag', 'v0.1.0-beta.2');
     expect(setFailedMock).not.toHaveBeenCalled();
     // next develop up
     lastTagVersions = ['v0.1.0-beta.2', 'v0.1.0-beta.1'];
     await mainTest.run();
     expect(mainTest.config.version).toBe('v0.1.0-beta.2'); // after get from last repo tag
-    expect(infoMock).toHaveBeenNthCalledWith(3, 'Pushed new tag "v0.1.0-beta.3" is OK. Work done');
+    expect(infoMock).toHaveBeenNthCalledWith(6, 'Pushed new tag "v0.1.0-beta.3" is OK. Work done');
     expect(setOutputMock).toHaveBeenNthCalledWith(3, 'newtag', 'v0.1.0-beta.3');
     expect(setFailedMock).not.toHaveBeenCalled();
     //
@@ -836,7 +882,7 @@ describe('main.ts', () => {
     // Run
     await mainTest.run();
     expect(mainTest.config.version).toBe('v0.1.0-beta.3'); // after get from last repo tag
-    expect(infoMock).toHaveBeenNthCalledWith(4, 'Pushed new tag "v0.1.0" is OK. Work done');
+    expect(infoMock).toHaveBeenNthCalledWith(8, 'Pushed new tag "v0.1.0" is OK. Work done');
     expect(setOutputMock).toHaveBeenNthCalledWith(4, 'newtag', 'v0.1.0');
     expect(setFailedMock).not.toHaveBeenCalled();
   });
@@ -894,7 +940,7 @@ describe('main.ts', () => {
     expect(mainTest.config.dryRun).toBe(false);
     // Run
     await mainTest.run();
-    expect(infoMock).toHaveBeenNthCalledWith(1, 'Pushed new tag "v2.6.3-dev.1" is OK. Work done');
+    expect(infoMock).toHaveBeenNthCalledWith(2, 'Pushed new tag "v2.6.3-dev.1" is OK. Work done');
     expect(setOutputMock).toHaveBeenNthCalledWith(1, 'newtag', 'v2.6.3-dev.1');
     expect(setFailedMock).not.toHaveBeenCalled();
     //
@@ -902,7 +948,7 @@ describe('main.ts', () => {
     //
     lastTagVersions = ['v2.6.3-dev.1'];
     await mainTest.run();
-    expect(infoMock).toHaveBeenNthCalledWith(2, 'Pushed new tag "v2.6.3-dev.2" is OK. Work done');
+    expect(infoMock).toHaveBeenNthCalledWith(4, 'Pushed new tag "v2.6.3-dev.2" is OK. Work done');
     expect(setOutputMock).toHaveBeenNthCalledWith(2, 'newtag', 'v2.6.3-dev.2');
     expect(setFailedMock).not.toHaveBeenCalled();
     //
@@ -922,7 +968,7 @@ describe('main.ts', () => {
     });
     jest.spyOn(mainTest.github, 'pushNewTag').mockImplementation();
     await mainTest.run();
-    expect(infoMock).toHaveBeenNthCalledWith(3, 'Pushed new tag "v2.6.12-dev.1" is OK. Work done');
+    expect(infoMock).toHaveBeenNthCalledWith(6, 'Pushed new tag "v2.6.12-dev.1" is OK. Work done');
     expect(setOutputMock).toHaveBeenNthCalledWith(3, 'newtag', 'v2.6.12-dev.1');
     expect(setFailedMock).not.toHaveBeenCalled();
   });
@@ -967,7 +1013,7 @@ describe('main.ts', () => {
     jest.spyOn(mainTest.github, 'pushNewTag').mockImplementation();
     // Run
     await mainTest.run();
-    expect(infoMock).toHaveBeenNthCalledWith(1, 'Pushed new tag "v2.6.3" is OK. Work done');
+    expect(infoMock).toHaveBeenNthCalledWith(2, 'Pushed new tag "v2.6.3" is OK. Work done');
     expect(setOutputMock).toHaveBeenNthCalledWith(1, 'newtag', 'v2.6.3');
     expect(setFailedMock).not.toHaveBeenCalled();
   });
@@ -1010,7 +1056,7 @@ describe('main.ts', () => {
     jest.spyOn(mainTest.github, 'pushNewTag').mockImplementation();
     // Run
     await mainTest.run();
-    expect(infoMock).toHaveBeenNthCalledWith(1, 'Pushed new tag "v5.0.0" is OK. Work done');
+    expect(infoMock).toHaveBeenNthCalledWith(2, 'Pushed new tag "v5.0.0" is OK. Work done');
     expect(setOutputMock).toHaveBeenNthCalledWith(1, 'newtag', 'v5.0.0');
     expect(setFailedMock).not.toHaveBeenCalled();
   });
@@ -1056,7 +1102,7 @@ describe('main.ts', () => {
     // Run
     // Prerelease to Release and patch up v3.0.0-rc.12 => v3.0.0
     await mainTest.run();
-    expect(infoMock).toHaveBeenNthCalledWith(1, 'Pushed new tag "v3.0.0" is OK. Work done');
+    expect(infoMock).toHaveBeenNthCalledWith(2, 'Pushed new tag "v3.0.0" is OK. Work done');
     expect(setOutputMock).toHaveBeenNthCalledWith(1, 'newtag', 'v3.0.0');
     expect(setFailedMock).not.toHaveBeenCalled();
     //
@@ -1070,7 +1116,7 @@ describe('main.ts', () => {
     // Run
     // Prerelease to Release and patch up v3.0.0-rc.12 => v3.0.0
     await mainTest.run();
-    expect(infoMock).toHaveBeenNthCalledWith(2, 'Pushed new tag "v3.0.0" is OK. Work done');
+    expect(infoMock).toHaveBeenNthCalledWith(4, 'Pushed new tag "v3.0.0" is OK. Work done');
     expect(setOutputMock).toHaveBeenNthCalledWith(2, 'newtag', 'v3.0.0');
     expect(setFailedMock).not.toHaveBeenCalled();
     //
@@ -1085,7 +1131,7 @@ describe('main.ts', () => {
     // Run
     // Release to Release and patch up v3.0.0 => v3.1.0
     await mainTest.run();
-    expect(infoMock).toHaveBeenNthCalledWith(3, 'Pushed new tag "v3.1.0" is OK. Work done');
+    expect(infoMock).toHaveBeenNthCalledWith(6, 'Pushed new tag "v3.1.0" is OK. Work done');
     expect(setOutputMock).toHaveBeenNthCalledWith(3, 'newtag', 'v3.1.0');
     expect(setFailedMock).not.toHaveBeenCalled();
     //
@@ -1100,7 +1146,7 @@ describe('main.ts', () => {
     // Run
     // Release to Release and patch up v3.1.0 => v3.1.1
     await mainTest.run();
-    expect(infoMock).toHaveBeenNthCalledWith(4, 'Pushed new tag "v3.1.1" is OK. Work done');
+    expect(infoMock).toHaveBeenNthCalledWith(8, 'Pushed new tag "v3.1.1" is OK. Work done');
     expect(setOutputMock).toHaveBeenNthCalledWith(4, 'newtag', 'v3.1.1');
     expect(setFailedMock).not.toHaveBeenCalled();
   });
@@ -1143,7 +1189,7 @@ describe('main.ts', () => {
     jest.spyOn(mainTest.github, 'pushNewTag').mockImplementation();
     // Run
     await mainTest.run();
-    expect(infoMock).toHaveBeenNthCalledWith(1, 'Pushed new tag "v2.6.3-dev.1" is OK. Work done');
+    expect(infoMock).toHaveBeenNthCalledWith(2, 'Pushed new tag "v2.6.3-dev.1" is OK. Work done');
     expect(setOutputMock).toHaveBeenNthCalledWith(1, 'newtag', 'v2.6.3-dev.1');
     expect(setFailedMock).not.toHaveBeenCalled();
   });
@@ -1187,7 +1233,7 @@ describe('main.ts', () => {
     jest.spyOn(mainTest.github, 'pushNewTag').mockImplementation();
     // Run
     await mainTest.run();
-    expect(infoMock).toHaveBeenNthCalledWith(1, 'Pushed new tag "v2.6.3-dev" is OK. Work done');
+    expect(infoMock).toHaveBeenNthCalledWith(2, 'Pushed new tag "v2.6.3-dev" is OK. Work done');
     expect(setOutputMock).toHaveBeenNthCalledWith(1, 'newtag', 'v2.6.3-dev');
     expect(setFailedMock).not.toHaveBeenCalled();
     //
@@ -1242,7 +1288,7 @@ describe('main.ts', () => {
     jest.spyOn(mainTest.github, 'pushNewTag').mockImplementation();
     // Run
     await mainTest.run();
-    expect(infoMock).toHaveBeenNthCalledWith(1, 'Pushed new tag "v2.6.3+build101" is OK. Work done');
+    expect(infoMock).toHaveBeenNthCalledWith(2, 'Pushed new tag "v2.6.3+build101" is OK. Work done');
     expect(setOutputMock).toHaveBeenNthCalledWith(1, 'newtag', 'v2.6.3+build101');
     expect(setFailedMock).not.toHaveBeenCalled();
     //
@@ -1270,7 +1316,7 @@ describe('main.ts', () => {
     jest.spyOn(mainTest.github, 'pushNewTag').mockImplementation();
     // Run
     await mainTest.run();
-    expect(infoMock).toHaveBeenNthCalledWith(2, 'Pushed new tag "v2.6.3+649b8949" is OK. Work done');
+    expect(infoMock).toHaveBeenNthCalledWith(4, 'Pushed new tag "v2.6.3+649b8949" is OK. Work done');
     expect(setOutputMock).toHaveBeenNthCalledWith(2, 'newtag', 'v2.6.3+649b8949');
     expect(setFailedMock).not.toHaveBeenCalled();
   });
@@ -1313,7 +1359,7 @@ describe('main.ts', () => {
     // NO PUSH NEW TAG. ONLY OUTPUT
     // Run
     await mainTest.run();
-    expect(infoMock).toHaveBeenNthCalledWith(1, 'Dry Run is enabled. Just output new tag version "v2.6.3" ...');
+    expect(infoMock).toHaveBeenNthCalledWith(2, 'Dry Run is enabled. Just output new tag version "v2.6.3" ...');
     expect(setOutputMock).toHaveBeenNthCalledWith(1, 'newtag', 'v2.6.3');
     expect(setFailedMock).not.toHaveBeenCalled();
   });

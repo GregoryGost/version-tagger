@@ -1,7 +1,7 @@
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import { dirname, normalize, join } from 'node:path';
 import { existsSync, readFileSync } from 'node:fs';
-import { getInput, getBooleanInput, setFailed } from '@actions/core';
+import { getInput, getBooleanInput, setFailed, info } from '@actions/core';
 //
 import type { ReleaseTypeT } from '../types';
 import type { PackageJson } from 'type-fest';
@@ -262,7 +262,9 @@ class Config {
     while (!existsSync(join(currentDir, 'package.json'))) {
       currentDir = join(currentDir, '..');
     }
-    return normalize(currentDir);
+    const finalCurrentDir = normalize(currentDir);
+    info(`Root directory: ${finalCurrentDir}`);
+    return finalCurrentDir;
   }
 
   /**

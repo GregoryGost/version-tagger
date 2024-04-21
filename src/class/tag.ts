@@ -1,6 +1,6 @@
 import { createHmac } from 'node:crypto';
 import { inc, clean, parse } from 'semver';
-import { setFailed } from '@actions/core';
+import { setFailed, info } from '@actions/core';
 //
 import type { SemVer } from 'semver';
 import type { ReleaseTypeT } from '../types';
@@ -119,6 +119,7 @@ class Tag {
       //
       // Clear version. Prefix remove
       const version: string | null = clean(this.version);
+      info(`Now version: ${version}`);
       if (version === null) throw new Error(`Error clean version "${this.version}"`);
       //
       // Get patch version for frieze
