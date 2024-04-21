@@ -1,3 +1,4 @@
+import { env } from 'node:process';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import { dirname, normalize, join } from 'node:path';
 import { existsSync, readFileSync } from 'node:fs';
@@ -253,9 +254,15 @@ class Config {
 
   /**
    * Determining the Project Root Path
+   * * Github variables: <https://docs.github.com/en/actions/learn-github-actions/variables>
    * @returns {string} application root path
    */
   private static getRootDir(): string {
+    if (env.GITHUB_WORKSPACE !== undefined && env.GITHUB_WORKSPACE !== '') {
+      const finalCurrentDir = normalize(env.GITHUB_WORKSPACE);
+      info(`Root directory: ${finalCurrentDir}`);
+      return finalCurrentDir;
+    }
     const filename: string = fileURLToPath(pathToFileURL(__filename).toString());
     const dir = dirname(filename);
     let currentDir: string = dir;
