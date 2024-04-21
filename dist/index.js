@@ -32228,7 +32228,7 @@ class Config {
     _githubHeadRef;
     _inputUseLastTag;
     constructor(root_path) {
-        this.rootPath = root_path ?? this.getRootDir();
+        this.rootPath = root_path ?? Config.getRootDir();
         this._inputToken = (0, core_1.getInput)('token', { required: true });
         this._inputVersion = (0, core_1.getInput)('version', { required: false });
         this._inputUseLastTag = (0, core_1.getBooleanInput)('uselasttag', { required: false }) ?? false;
@@ -32298,7 +32298,7 @@ class Config {
     get useLastTag() {
         return this._inputUseLastTag;
     }
-    getRootDir() {
+    static getRootDir() {
         if (node_process_1.env.GITHUB_WORKSPACE !== undefined && node_process_1.env.GITHUB_WORKSPACE !== '') {
             const finalCurrentDir = (0, node_path_1.normalize)(node_process_1.env.GITHUB_WORKSPACE);
             (0, core_1.info)(`Root directory: ${finalCurrentDir}`);
