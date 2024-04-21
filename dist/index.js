@@ -32304,7 +32304,9 @@ class Config {
         while (!(0, node_fs_1.existsSync)((0, node_path_1.join)(currentDir, 'package.json'))) {
             currentDir = (0, node_path_1.join)(currentDir, '..');
         }
-        return (0, node_path_1.normalize)(currentDir);
+        const finalCurrentDir = (0, node_path_1.normalize)(currentDir);
+        (0, core_1.info)(`Root directory: ${finalCurrentDir}`);
+        return finalCurrentDir;
     }
     getPackageData() {
         const packageData = (0, node_fs_1.readFileSync)((0, node_path_1.normalize)((0, node_path_1.join)(this.rootPath, 'package.json')), 'utf-8');
@@ -32537,6 +32539,7 @@ class Tag {
     upVersion() {
         try {
             const version = (0, semver_1.clean)(this.version);
+            (0, core_1.info)(`Now version: ${version}`);
             if (version === null)
                 throw new Error(`Error clean version "${this.version}"`);
             if (this.postfix !== null && this.postfix !== '' && this.releaseType === null) {

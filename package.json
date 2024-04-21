@@ -1,6 +1,6 @@
 {
   "name": "@gregory-gost/version-tagger",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "GitHub Action to automate tag-based version control. For both production and development.",
   "license": "GPL-3",
   "private": true,
@@ -31,7 +31,7 @@
   "exports": {
     ".": "./dist/index.js"
   },
-  "packageManager": "pnpm@8.15.4",
+  "packageManager": "pnpm@9.0.4",
   "engines": {
     "node": ">=20"
   },
@@ -44,8 +44,7 @@
     "lint": "npx eslint . -c ./.github/linters/.eslintrc.yml",
     "package": "ncc build src/index.ts --license licenses.txt",
     "package:watch": "pnpm run package -- --watch",
-    "test": "jest",
-    "all": "pnpm run format:write && pnpm run lint && pnpm run test && pnpm run coverage && pnpm run package",
+    "all": "pnpm run format:write && pnpm run lint && pnpm run ci-test && pnpm run coverage && pnpm run package",
     "check lib": "pnpm outdated"
   },
   "jest": {

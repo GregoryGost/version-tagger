@@ -18,6 +18,7 @@ const defaultRootDir: string = normalize(join(cwd(), '__tests__', 'package_versi
 let getInputMock: jest.SpyInstance;
 let getBooleanInputMock: jest.SpyInstance;
 let setFailedMock: jest.SpyInstance;
+let infoMock: jest.SpyInstance;
 
 describe('config.ts', () => {
   beforeEach(() => {
@@ -29,6 +30,7 @@ describe('config.ts', () => {
     setFailedMock = jest.spyOn(core, 'setFailed').mockImplementation();
     getInputMock = jest.spyOn(core, 'getInput').mockImplementation();
     getBooleanInputMock = jest.spyOn(core, 'getBooleanInput').mockImplementation();
+    infoMock = jest.spyOn(core, 'info').mockImplementation();
     //
     getInputMock.mockImplementation((name: string): string => {
       switch (name) {
@@ -53,6 +55,7 @@ describe('config.ts', () => {
     const config: Config = new Config();
     const currentDir: string = normalize(cwd());
     expect(config.root).toBe(currentDir);
+    expect(infoMock).toHaveBeenNthCalledWith(1, `Root directory: ${currentDir}`);
   });
   /**
    * Get input version test
