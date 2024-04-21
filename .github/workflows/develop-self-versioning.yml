@@ -10,15 +10,15 @@ permissions:
 
 jobs:
   develop-version:
-    name: Develop Self Versioning
+    name: Develop Self Versioning job
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout
+      - name: Checkout step
         id: checkout
         uses: actions/checkout@v4
 
-      - name: New Version
+      - name: New Version step
         id: new-version
         uses: ./
         with:
