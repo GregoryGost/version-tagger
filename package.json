@@ -82,7 +82,7 @@
     "semver": "7.6.0"
   },
   "devDependencies": {
-    "@octokit/plugin-rest-endpoint-methods": "12.2.2",
+    "@octokit/plugin-rest-endpoint-methods": "13.2.1",
     "@octokit/types": "13.4.0",
     "@types/jest": "29.5.12",
     "@types/node": "20.12.7",
