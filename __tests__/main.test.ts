@@ -26,7 +26,7 @@ process.env.GITHUB_SHA = 'c3d0be41ecbe669545ee3e94d31ed9a4bc91ee3c';
 process.env.GITHUB_HEAD_REF = 'develop';
 
 // Mock the GitHub Actions core library
-let getInputMock: jest.SpyInstance;
+let getInputMock: jest.SpyInstance; // TODO: jest.SpiedFunction<typeof core.getInput>
 let getBooleanInputMock: jest.SpyInstance;
 let setFailedMock: jest.SpyInstance;
 let setOutputMock: jest.SpyInstance;

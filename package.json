@@ -37,51 +37,20 @@
   },
   "scripts": {
     "bundle": "pnpm run format:write && pnpm run package",
-    "ci-test": "jest",
-    "coverage": "make-coverage-badge --output-path ./badges/coverage.svg",
-    "format:write": "prettier --write **/*.ts",
-    "format:check": "prettier --check **/*.ts",
-    "lint": "npx eslint . -c ./.github/linters/.eslintrc.yml",
-    "package": "ncc build src/index.ts --license licenses.txt",
+    "ci-test": "pnpm jest",
+    "coverage": "pnpm make-coverage-badge --output-path ./badges/coverage.svg",
+    "format:write": "pnpm prettier --write .",
+    "format:check": "pnpm prettier --check .",
+    "lint": "pnpm eslint . -c ./.github/linters/.eslintrc.yml",
+    "package": "pnpm ncc build src/index.ts -o dist --source-map --license licenses.txt",
     "package:watch": "pnpm run package -- --watch",
     "all": "pnpm run format:write && pnpm run lint && pnpm run ci-test && pnpm run coverage && pnpm run package",
     "check lib": "pnpm outdated"
   },
-  "jest": {
-    "preset": "ts-jest",
-    "verbose": true,
-    "clearMocks": true,
-    "testEnvironment": "node",
-    "moduleFileExtensions": [
-      "js",
-      "ts"
-    ],
-    "testMatch": [
-      "**/*.test.ts"
-    ],
-    "testPathIgnorePatterns": [
-      "/node_modules/",
-      "/dist/"
-    ],
-    "transform": {
-      "^.+\\.ts$": "ts-jest"
-    },
-    "coverageReporters": [
-      "json-summary",
-      "text",
-      "lcov"
-    ],
-    "collectCoverage": true,
-    "collectCoverageFrom": [
-      "./src/**"
-    ]
-  },
-  "dependencies": {
+  "devDependencies": {
+    "@jest/globals": "29.7.0",
     "@actions/core": "1.10.1",
     "@actions/github": "6.0.0",
-    "semver": "7.6.2"
-  },
-  "devDependencies": {
     "@octokit/plugin-rest-endpoint-methods": "13.2.1",
     "@octokit/types": "13.5.0",
     "@types/jest": "29.5.12",
@@ -101,6 +70,7 @@
     "prettier-eslint": "16.3.0",
     "ts-jest": "29.1.2",
     "type-fest": "4.18.2",
+    "semver": "7.6.2",
     "typescript": "5.4.5"
   }
 }
