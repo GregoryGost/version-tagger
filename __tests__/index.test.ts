@@ -2,6 +2,7 @@
  * Unit tests for src/index.ts
  */
 
+import { expect } from '@jest/globals';
 import { join } from 'node:path';
 import * as core from '@actions/core';
 

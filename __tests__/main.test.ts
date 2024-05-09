@@ -2,6 +2,7 @@
  * Unit tests for src/class/main.ts
  */
 
+import { expect } from '@jest/globals';
 import { cwd } from 'node:process';
 import { normalize, join } from 'node:path';
 import * as core from '@actions/core';

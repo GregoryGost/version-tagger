@@ -1,6 +1,8 @@
 /**
  * Unit tests for src/class/tag.ts
  */
+
+import { expect } from '@jest/globals';
 import * as core from '@actions/core';
 //
 import { Tag } from '../src/class/tag';
