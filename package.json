@@ -31,7 +31,6 @@
   "exports": {
     ".": "./dist/index.js"
   },
-  "packageManager": "pnpm@9.1.0",
   "engines": {
     "node": ">=20"
   },
