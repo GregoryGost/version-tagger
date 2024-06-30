@@ -5,10 +5,13 @@
 ![CodeSize](https://img.shields.io/github/languages/code-size/GregoryGost/version-tagger)
 ![IssuesOpen](https://img.shields.io/github/issues-raw/GregoryGost/version-tagger)
 ![LatestRelease](https://img.shields.io/github/v/release/GregoryGost/version-tagger)
+![LatestTag](https://img.shields.io/github/v/tag/GregoryGost/version-tagger?sort=date&logo=substack&logoColor=white)
 ![CI](https://github.com/GregoryGost/version-tagger/actions/workflows/ci.yml/badge.svg)
 [![Check dist/](https://github.com/GregoryGost/version-tagger/actions/workflows/check-dist.yml/badge.svg)](https://github.com/GregoryGost/version-tagger/actions/workflows/check-dist.yml)
 [![CodeQL](https://github.com/GregoryGost/version-tagger/actions/workflows/codeql-analysis.yml/badge.svg)](https://github.com/GregoryGost/version-tagger/actions/workflows/codeql-analysis.yml)
 [![Coverage](./badges/coverage.svg)](./badges/coverage.svg)
+![Watchers](https://img.shields.io/github/watchers/GregoryGost/version-tagger)
+![RepoStars](https://img.shields.io/github/stars/GregoryGost/version-tagger)
 
 GitHub Action to automate tag-based version control. For both production and development.
 
