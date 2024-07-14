@@ -210,7 +210,7 @@ Gets the version `6.0.0` from the `package.json` file.
 
 Gets the version `7.0.0` from the `package.json` file.
 
-- Result: `v7.0.0` to output step GitHub action
+- Result: `v7.0.0` to output step GitHub Action
 
 ```yml
 - name: Create tag
