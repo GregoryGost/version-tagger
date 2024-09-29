@@ -5,10 +5,13 @@
 ![CodeSize](https://img.shields.io/github/languages/code-size/GregoryGost/version-tagger)
 ![IssuesOpen](https://img.shields.io/github/issues-raw/GregoryGost/version-tagger)
 ![LatestRelease](https://img.shields.io/github/v/release/GregoryGost/version-tagger)
+![LatestTag](https://img.shields.io/github/v/tag/GregoryGost/version-tagger?sort=date&logo=substack&logoColor=white)
 ![CI](https://github.com/GregoryGost/version-tagger/actions/workflows/ci.yml/badge.svg)
 [![Check dist/](https://github.com/GregoryGost/version-tagger/actions/workflows/check-dist.yml/badge.svg)](https://github.com/GregoryGost/version-tagger/actions/workflows/check-dist.yml)
 [![CodeQL](https://github.com/GregoryGost/version-tagger/actions/workflows/codeql-analysis.yml/badge.svg)](https://github.com/GregoryGost/version-tagger/actions/workflows/codeql-analysis.yml)
 [![Coverage](./badges/coverage.svg)](./badges/coverage.svg)
+![Watchers](https://img.shields.io/github/watchers/GregoryGost/version-tagger)
+![RepoStars](https://img.shields.io/github/stars/GregoryGost/version-tagger)
 
 GitHub Action to automate tag-based version control. For both production and development.
 
@@ -27,28 +30,28 @@ Configure permission:
 
 | name            | required | description                                                                                                                                                                                                                                                                                                                                                                               | default |
 | --------------- | -------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------- |
-| **token**       | `true`   | The GitHub Token to use for reference management in the repo                                                                                                                                                                                                                                                                                                                              |         |
-| **version**     | `false`  | Version from previous action output. Pattern semver <https://semver.org>: `x.y.z`                                                                                                                                                                                                                                                                                                         | `0.1.0` |
+| **token**       | `true`   | The GitHub Token to use for reference management in the repository                                                                                                                                                                                                                                                                                                                        |         |
+| **version**     | `false`  | Version from previous action output. Pattern SemVer <https://semver.org>: `x.y.z`                                                                                                                                                                                                                                                                                                         | `0.1.0` |
 | **prefix**      | `false`  | A prefix that will appear immediately before the tag version. Example: `v` => `v1.0.0`                                                                                                                                                                                                                                                                                                    | `''`    |
 | **postfix**     | `false`  | Postfix that will appear immediately after the tag version. Example: `beta` => `v1.0.0-beta.0`                                                                                                                                                                                                                                                                                            | `''`    |
 | **postfixnoup** | `false`  | Do not apply version upgrade to postfix. No number will be added to the postfix. Example: `v1.0.0-beta`, `2.5.1-rc`                                                                                                                                                                                                                                                                       | `false` |
 | **metadata**    | `false`  | Add your own metadata, or use the sliced sha1 version hash.. Example: `build123` or `fyf2c5fr` => `v1.0.0-beta.1+fyf2c5fr`                                                                                                                                                                                                                                                                | `''`    |
-| **releasetype** | `false`  | Used in conjunction with a `auto` parameter (but there is an exception `patch`). Release type version. `major`(X.y.z) or `minor`(x.Y.z) or `patch`(x.y.Z). If not specified, then no version will be incremented. All variants: `major`, `premajor`, `minor`, `preminor`, `patch`, `prepatch`, `prerelease`. More in semver doc: <https://github.com/npm/node-semver/blob/main/README.md> | `''`    |
+| **releasetype** | `false`  | Used in conjunction with a `auto` parameter (but there is an exception `patch`). Release type version. `major`(X.y.z) or `minor`(x.Y.z) or `patch`(x.y.Z). If not specified, then no version will be incremented. All variants: `major`, `premajor`, `minor`, `preminor`, `patch`, `prepatch`, `prerelease`. More in SemVer doc: <https://github.com/npm/node-semver/blob/main/README.md> | `''`    |
 | **auto**        | `false`  | Forced version update. DANGEROUS-1!!! May be incorrect because in some cases duplicates the version upgrade. DANGEROUS-2!!! The version in the file may not match what will be in the tags as a result. If `FALSE`, no automatic promotions will be made.                                                                                                                                 | `false` |
 | **dryrun**      | `false`  | If this value is true, the tag will not be pushed. Use for test this action                                                                                                                                                                                                                                                                                                               | `false` |
 
 ### Outputs
 
-| name       | description                                                   |
-| ---------- | ------------------------------------------------------------- |
-| **newtag** | The GitHub Token to use for reference management in the repo. |
+| name       | description                                                         |
+| ---------- | ------------------------------------------------------------------- |
+| **newtag** | The GitHub Token to use for reference management in the repository. |
 
 ## Usage
 
 Example `.github/workflows/develop.yml` that will execute when a `push` or `pull_request` to the `develop` branch
 occurs.
 
-`token: ${{ secrets.GITHUB_TOKEN }}` - is required parameter. Github automatically generates this token. There is no
+`token: ${{ secrets.GITHUB_TOKEN }}` - is required parameter. GitHub automatically generates this token. There is no
 need to create it separately. Plus it's not safe!
 
 ```yml
@@ -120,7 +123,7 @@ Gets the version `2.0.0` from the previous step workflow
 ### 3. Example: Repository last tag version (no use package.json)
 
 Gets the versions array `['v3.0.0-rc.12', 'v3.0.0-rc.11', 'v3.0.0-rc.10']` from the tag list in repository  
-Removes pre-release postfixes when using the release type.
+Removes prerelease postfixes when using the release type.
 
 - Result: `v3.0.0` if releasetype: `patch` or `minor` or `major` or etc.
 - Next result: `v3.0.1` if releasetype `patch`
@@ -207,7 +210,7 @@ Gets the version `6.0.0` from the `package.json` file.
 
 Gets the version `7.0.0` from the `package.json` file.
 
-- Result: `v7.0.0` to output step github action
+- Result: `v7.0.0` to output step GitHub Action
 
 ```yml
 - name: Create tag
