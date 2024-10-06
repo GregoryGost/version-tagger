@@ -1,6 +1,6 @@
 {
   "name": "@gregory-gost/version-tagger",
-  "version": "1.0.4",
+  "version": "1.0.5",
   "description": "GitHub Action to automate tag-based version control. For both production and development.",
   "license": "GPL-3",
   "private": true,
@@ -47,12 +47,12 @@
     "check-lib": "pnpm outdated"
   },
   "devDependencies": {
-    "@actions/core": "1.10.1",
+    "@actions/core": "1.11.1",
     "@actions/github": "6.0.0",
     "@jest/globals": "29.7.0",
     "@octokit/core": "6.1.2",
-    "@octokit/plugin-rest-endpoint-methods": "13.2.5",
-    "@octokit/types": "13.6.0",
+    "@octokit/plugin-rest-endpoint-methods": "13.2.6",
+    "@octokit/types": "13.6.1",
     "@types/jest": "29.5.13",
     "@types/node": "22.7.4",
     "@types/semver": "7.5.8",
