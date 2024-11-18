@@ -244,9 +244,9 @@ can use the project in any form, including for commercial activities, but it is 
 project does not provide any guarantees for the performance of the executable files, and also does not bear any
 responsibility for claims or damage caused.
 
-This repository contains references to all modules used and their licenses. They are collected in a
-[special license file](./dist/licenses.txt). Their authors are (or are not) responsible for the quality and stability of
-the operation of these modules.
+This application uses external modules. The authors of these modules are (or are not) responsible for the quality and
+stability of their work. See the licenses of these modules. External modules are listed in the dependencies file of the
+package.json.
 
 ## About
 
