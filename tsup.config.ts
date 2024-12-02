@@ -4,7 +4,7 @@ export default defineConfig({
   outDir: 'dist',
   entry: ['src/index.ts'],
   target: 'esnext',
-  format: ['esm'],
+  format: ['cjs'],
   minify: true,
   treeshake: true,
   clean: true,
