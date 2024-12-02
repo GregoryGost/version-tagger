@@ -41,8 +41,8 @@
     "coverage": "pnpm make-coverage-badge --output-path ./badges/coverage.svg",
     "format:write": "pnpm prettier --write .",
     "format:check": "pnpm prettier --check .",
-    "lint": "pnpm eslint . --config eslint.config.mjs",
-    "lint:debug": "pnpm eslint --debug . --config eslint.config.mjs",
+    "lint": "pnpm eslint -c eslint.config.mjs .",
+    "lint:debug": "pnpm eslint --debug -c eslint.config.mjs .",
     "package": "pnpm tsup",
     "all": "pnpm run format:write && pnpm run lint && pnpm run ci-test && pnpm run coverage && pnpm run package",
     "check-lib": "pnpm outdated"
