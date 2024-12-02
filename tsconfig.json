@@ -3,9 +3,9 @@
   "compilerOptions": {
     "rootDir": ".",
     "outDir": "dist",
-    "newLine": "lf",
-    "module": "ESNext",
-    "moduleResolution": "node"
+    "newLine": "lf"
+    // "module": "ESNext",
+    // "moduleResolution": "node"
   },
   "exclude": ["./dist", "./node_modules", "./__tests__", "./coverage"]
 }

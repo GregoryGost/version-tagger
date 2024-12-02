@@ -4,7 +4,6 @@
   "description": "GitHub Action to automate tag-based version control. For both production and development.",
   "license": "GPL-3",
   "private": true,
-  "type": "module",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/GregoryGost/version-tagger.git"
@@ -30,7 +29,7 @@
     "email": "info@gregory-gost.ru"
   },
   "exports": {
-    ".": "./dist/index.cjs"
+    ".": "./dist/index.js"
   },
   "engines": {
     "node": ">=20"
