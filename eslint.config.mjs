@@ -41,6 +41,12 @@ export default [
     }
   },
   {
+    files: ['__tests__/**/*'],
+    rules: {
+      'import/no-namespace': 'off'
+    }
+  },
+  {
     rules: {
       'importPlugin/no-unresolved': 'off',
       camelcase: 'off',
