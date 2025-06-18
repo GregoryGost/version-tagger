@@ -3,7 +3,8 @@
   "compilerOptions": {
     "rootDir": ".",
     "outDir": "dist",
-    "newLine": "lf"
+    "newLine": "lf",
+    "isolatedModules": true
     // "module": "ESNext",
     // "moduleResolution": "node"
   },
