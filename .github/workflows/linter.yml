@@ -46,7 +46,7 @@ jobs:
         # issue for ESLint 9: https://github.com/super-linter/super-linter/issues/6405
       - name: Lint Codebase
         id: super-linter
-        uses: super-linter/super-linter/slim@v7.4.0
+        uses: super-linter/super-linter/slim@v8.2.1
         env:
           DEFAULT_BRANCH: develop
           FILTER_REGEX_EXCLUDE: dist/**/*
