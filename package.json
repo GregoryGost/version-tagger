@@ -47,7 +47,7 @@
     "check-lib": "pnpm outdated"
   },
   "devDependencies": {
-    "@actions/core": "2.0.2",
+    "@actions/core": "3.0.1",
     "@actions/github": "7.0.0",
     "@eslint/js": "9.39.3",
     "@jest/globals": "30.3.0",
