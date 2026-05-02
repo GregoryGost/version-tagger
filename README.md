@@ -78,7 +78,7 @@ jobs:
 
       - name: Create tag
         id: create-tag
-        uses: GregoryGost/version-tagger@v1.0.0
+        uses: GregoryGost/version-tagger@v1.1.0
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           prefix: 'v'
@@ -95,7 +95,7 @@ Gets the version `1.0.0` from the `package.json` file.
 ```yml
 - name: Create tag
   id: create-tag
-  uses: GregoryGost/version-tagger@v1.0.0
+  uses: GregoryGost/version-tagger@v1.1.0
   with:
     token: ${{ secrets.GITHUB_TOKEN }}
     prefix: 'v'
@@ -113,7 +113,7 @@ Gets the version `2.0.0` from the previous step workflow
 
 - name: Create tag
   id: create-tag
-  uses: GregoryGost/version-tagger@v1.0.0
+  uses: GregoryGost/version-tagger@v1.1.0
   with:
     token: ${{ secrets.GITHUB_TOKEN }}
     version: ${{ steps.previous-step-id.outputs.version }}
@@ -134,7 +134,7 @@ Removes prerelease postfixes when using the release type.
 
 - name: Create tag
   id: create-tag
-  uses: GregoryGost/version-tagger@v1.0.0
+  uses: GregoryGost/version-tagger@v1.1.0
   with:
     token: ${{ secrets.GITHUB_TOKEN }}
     prefix: 'v'
@@ -152,7 +152,7 @@ Gets the version `4.0.0` from the `package.json` file.
 ```yml
 - name: Create tag
   id: create-tag
-  uses: GregoryGost/version-tagger@v1.0.0
+  uses: GregoryGost/version-tagger@v1.1.0
   with:
     token: ${{ secrets.GITHUB_TOKEN }}
     prefix: 'v'
@@ -170,7 +170,7 @@ Gets the version `5.0.0` from the `package.json` file.
 ```yml
 - name: Create tag
   id: create-tag
-  uses: GregoryGost/version-tagger@v1.0.0
+  uses: GregoryGost/version-tagger@v1.1.0
   with:
     token: ${{ secrets.GITHUB_TOKEN }}
     prefix: 'v'
@@ -187,7 +187,7 @@ Gets the version `6.0.0` from the `package.json` file.
 ```yml
 - name: Create tag
   id: create-tag
-  uses: GregoryGost/version-tagger@v1.0.0
+  uses: GregoryGost/version-tagger@v1.1.0
   with:
     token: ${{ secrets.GITHUB_TOKEN }}
     prefix: 'v'
@@ -199,7 +199,7 @@ Gets the version `6.0.0` from the `package.json` file.
 ```yml
 - name: Create tag
   id: create-tag
-  uses: GregoryGost/version-tagger@v1.0.0
+  uses: GregoryGost/version-tagger@v1.1.0
   with:
     token: ${{ secrets.GITHUB_TOKEN }}
     prefix: 'v'
@@ -215,7 +215,7 @@ Gets the version `7.0.0` from the `package.json` file.
 ```yml
 - name: Create tag
   id: create-tag
-  uses: GregoryGost/version-tagger@v1.0.0
+  uses: GregoryGost/version-tagger@v1.1.0
   with:
     token: ${{ secrets.GITHUB_TOKEN }}
     prefix: 'v'
