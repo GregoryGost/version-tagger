@@ -11,15 +11,26 @@ import * as core from '@actions/core';
 //
 import { Config } from '../src/class/config';
 
+jest.mock(
+  '@actions/core',
+  () => ({
+    getInput: jest.fn(),
+    getBooleanInput: jest.fn(),
+    setFailed: jest.fn(),
+    info: jest.fn()
+  }),
+  { virtual: true }
+);
+
 const mockToken =
   'oBgGDgMmhwHAwxJaqBZzImWeypnYKWwQSGtvtYxhNzzYomNINkLaOHAVFCNwtOgXSbuiBeZuaMLIhDNUwVzeoTfQUyoLYLzROcNXJFiwRGZLzYBgVhwYkZMgGxFmvcsTqtHHADnlQjkQBwRPjraMMWvEersLQIJT';
 const defaultRootDir: string = normalize(join(cwd(), '__tests__', 'package_version_default'));
 
 // Mock the GitHub Actions core library
-let getInputMock: jest.SpyInstance;
-let getBooleanInputMock: jest.SpyInstance;
-let setFailedMock: jest.SpyInstance;
-let infoMock: jest.SpyInstance;
+let getInputMock: jest.Mock;
+let getBooleanInputMock: jest.Mock;
+let setFailedMock: jest.Mock;
+let infoMock: jest.Mock;
 
 describe('config.ts', () => {
   beforeEach(() => {
@@ -29,10 +40,10 @@ describe('config.ts', () => {
     process.env.GITHUB_HEAD_REF = 'develop';
     process.env.GITHUB_WORKSPACE = '';
     //
-    setFailedMock = jest.spyOn(core, 'setFailed').mockImplementation();
-    getInputMock = jest.spyOn(core, 'getInput').mockImplementation();
-    getBooleanInputMock = jest.spyOn(core, 'getBooleanInput').mockImplementation();
-    infoMock = jest.spyOn(core, 'info').mockImplementation();
+    setFailedMock = jest.mocked(core.setFailed);
+    getInputMock = jest.mocked(core.getInput);
+    getBooleanInputMock = jest.mocked(core.getBooleanInput);
+    infoMock = jest.mocked(core.info);
     //
     getInputMock.mockImplementation((name: string): string => {
       switch (name) {
