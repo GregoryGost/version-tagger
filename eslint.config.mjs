@@ -30,7 +30,7 @@ export default [
       sourceType: 'module',
       parser: tsLint.parser, // @typescript-eslint/parser
       parserOptions: {
-        project: ['./.github/linters/tsconfig.json', './tsconfig.json']
+        project: ['./.github/linters/tsconfig.json']
       },
       globals: {
         ...globals.node,
@@ -52,7 +52,13 @@ export default [
       camelcase: 'off',
       'i18n-text/no-en': 'off',
       'importPlugin/no-namespace': 'off',
-      'no-console': 'warn'
+      'no-console': 'warn',
+      'eslint-comments/no-use': 'off'
+    }
+  },
+  {
+    linterOptions: {
+      reportUnusedDisableDirectives: 'off'
     }
   }
 ];

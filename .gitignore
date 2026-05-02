@@ -108,3 +108,6 @@ __tests__/runner/*
 *.back
 *.bkp
 *.dtmp
+
+# AI
+.agent/

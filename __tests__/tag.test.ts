@@ -7,15 +7,21 @@ import * as core from '@actions/core';
 //
 import { Tag } from '../src/class/tag';
 
-// Mock the GitHub Actions core library
-let setFailedMock: jest.SpyInstance;
+jest.mock(
+  '@actions/core',
+  () => ({
+    setFailed: jest.fn(),
+    info: jest.fn()
+  }),
+  { virtual: true }
+);
+
+let setFailedMock: jest.MockedFunction<typeof core.setFailed>;
 
 describe('tag.ts', () => {
   beforeEach(() => {
     jest.clearAllMocks();
-    //
-    setFailedMock = jest.spyOn(core, 'setFailed').mockImplementation();
-    jest.spyOn(core, 'info').mockImplementation();
+    setFailedMock = jest.mocked(core.setFailed);
   });
   /**
    * Instance test

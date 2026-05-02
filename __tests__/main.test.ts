@@ -9,6 +9,38 @@ import * as core from '@actions/core';
 //
 import { Main } from '../src/class/main';
 
+jest.mock(
+  '@actions/core',
+  () => ({
+    getInput: jest.fn(),
+    getBooleanInput: jest.fn(),
+    setFailed: jest.fn(),
+    setOutput: jest.fn(),
+    info: jest.fn(),
+    warning: jest.fn()
+  }),
+  { virtual: true }
+);
+
+jest.mock(
+  '@actions/github',
+  () => ({
+    context: {
+      repo: {
+        owner: 'GregoryGost',
+        repo: 'version-tagger'
+      }
+    },
+    getOctokit: jest.fn(() => ({
+      rest: {
+        repos: {},
+        git: {}
+      }
+    }))
+  }),
+  { virtual: true }
+);
+
 const mockToken = 'oBgGDgMmhwHAwxJaqBZzImWeypnYKWwQSGtvtYxhNzzYomNINkLaOHAVFCNwtOgXSb';
 const mockVersion = '';
 const mockPrefix = 'v';
@@ -27,11 +59,11 @@ process.env.GITHUB_SHA = 'c3d0be41ecbe669545ee3e94d31ed9a4bc91ee3c';
 process.env.GITHUB_HEAD_REF = 'develop';
 
 // Mock the GitHub Actions core library
-let getInputMock: jest.SpyInstance; // TODO: jest.SpiedFunction<typeof core.getInput>
-let getBooleanInputMock: jest.SpyInstance;
-let setFailedMock: jest.SpyInstance;
-let setOutputMock: jest.SpyInstance;
-let infoMock: jest.SpyInstance;
+let getInputMock: jest.Mock;
+let getBooleanInputMock: jest.Mock;
+let setFailedMock: jest.Mock;
+let setOutputMock: jest.Mock;
+let infoMock: jest.Mock;
 //
 let runMock: jest.SpyInstance;
 
@@ -39,11 +71,11 @@ describe('main.ts', () => {
   beforeEach(() => {
     jest.clearAllMocks();
     //
-    getInputMock = jest.spyOn(core, 'getInput').mockImplementation();
-    getBooleanInputMock = jest.spyOn(core, 'getBooleanInput').mockImplementation();
-    setFailedMock = jest.spyOn(core, 'setFailed').mockImplementation();
-    setOutputMock = jest.spyOn(core, 'setOutput').mockImplementation();
-    infoMock = jest.spyOn(core, 'info').mockImplementation();
+    getInputMock = jest.mocked(core.getInput);
+    getBooleanInputMock = jest.mocked(core.getBooleanInput);
+    setFailedMock = jest.mocked(core.setFailed);
+    setOutputMock = jest.mocked(core.setOutput);
+    infoMock = jest.mocked(core.info);
     //
     getInputMock.mockImplementation((name: string): string => {
       switch (name) {

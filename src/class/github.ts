@@ -1,6 +1,5 @@
 import { setFailed, warning, info } from '@actions/core';
 import { context, getOctokit } from '@actions/github';
-import { GitHub } from '@actions/github/lib/utils';
 //
 import type {
   TagResponseT,
@@ -37,7 +36,7 @@ class Github {
   /**
    * Githab Octokit Api client instance
    */
-  private readonly _client: InstanceType<typeof GitHub>;
+  private readonly _client: ReturnType<typeof getOctokit>;
   /**
    * Tags in Github repository
    */
