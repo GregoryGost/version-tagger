@@ -18,26 +18,50 @@ import type {
   CreateRefResponseT
 } from '../src/types';
 
+jest.mock(
+  '@actions/core',
+  () => ({
+    setFailed: jest.fn(),
+    info: jest.fn(),
+    warning: jest.fn()
+  }),
+  { virtual: true }
+);
+
+jest.mock(
+  '@actions/github',
+  () => ({
+    context: {
+      repo: {
+        owner: 'GregoryGost',
+        repo: 'version-tagger'
+      }
+    },
+    getOctokit: jest.fn()
+  }),
+  { virtual: true }
+);
+
 const mockToken = 'oBgGDgMmhwHAwxJaqBZzImWeypnYKWwQSGtvtYxhNzzYomNINkLaOHAVFCNwtOgXSb';
 
 // Mock the GitHub Actions github library
-let getOctokitMock: jest.SpyInstance;
+let getOctokitMock: jest.Mock;
 // Mock the GitHub Actions core library
-let setFailedMock: jest.SpyInstance;
-let infoMock: jest.SpyInstance;
-let warningMock: jest.SpyInstance;
+let setFailedMock: jest.Mock;
+let infoMock: jest.Mock;
+let warningMock: jest.Mock;
 
 describe('github.ts', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    jest.resetAllMocks();
     //
     process.env.GITHUB_EVENT_PATH = join(__dirname, 'github_payload.json');
     process.env.GITHUB_REPOSITORY = 'GregoryGost/version-tagger';
     //
-    setFailedMock = jest.spyOn(core, 'setFailed').mockImplementation();
-    infoMock = jest.spyOn(core, 'info').mockImplementation();
-    warningMock = jest.spyOn(core, 'warning').mockImplementation();
-    getOctokitMock = jest.spyOn(github, 'getOctokit').mockImplementation();
+    setFailedMock = jest.mocked(core.setFailed);
+    infoMock = jest.mocked(core.info);
+    warningMock = jest.mocked(core.warning);
+    getOctokitMock = jest.mocked(github.getOctokit);
   });
   /**
    * Instance test

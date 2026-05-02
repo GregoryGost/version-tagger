@@ -101,10 +101,13 @@ __tests__/runner/*
 
 # IDE files
 .idea
-.vscode
+!.vscode
 *.code-workspace
 
 # Backup files
 *.back
 *.bkp
 *.dtmp
+
+# AI
+.agent/

@@ -1,0 +1,4 @@
+{
+  // Fix for VScode types view
+  "extends": "../tsconfig.jest.json"
+}
