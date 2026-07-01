@@ -70,7 +70,7 @@
     "jest": "30.3.0",
     "make-coverage-badge": "1.2.0",
     "prettier": "3.8.3",
-    "prettier-eslint": "16.4.2",
+    "prettier-eslint": "17.1.1",
     "semver": "7.7.4",
     "ts-jest": "29.4.9",
     "tsup": "8.5.1",
