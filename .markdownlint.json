@@ -19,14 +19,7 @@
     "ul_multi": 1
   },
   "MD033": {
-    "allowed_elements": [
-      "table",
-      "tr",
-      "td",
-      "img",
-      "p",
-      "i"
-    ]
+    "allowed_elements": ["table", "tr", "td", "img", "p", "i"]
   },
   "MD046": {
     "style": "fenced"
