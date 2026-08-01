@@ -4,19 +4,28 @@ import jsLint from '@eslint/js';
 import tsLint from 'typescript-eslint';
 //
 import eslintPluginJest from 'eslint-plugin-jest';
+// @ts-expect-error - eslint-plugin-github does not publish TypeScript declarations.
 import eslintPluginGithub from 'eslint-plugin-github';
 import eslintPluginJsonc from 'eslint-plugin-jsonc';
 //
 import eslintPluginPrettierRecommended from 'eslint-plugin-prettier/recommended';
 
+const githubRecommended = eslintPluginGithub.getFlatConfigs().recommended;
+const githubPlugins = { ...githubRecommended.plugins };
+
+delete githubPlugins.prettier;
+
 export default [
   {
-    // .eslintignore
-    ignores: ['**/node_modules', '**/dist', '**/coverage', '**/*.json', 'eslint.config.mjs']
+    // Global ignores
+    ignores: ['**/node_modules', '**/dist', '**/coverage', '**/*.json', 'eslint.config.ts']
   },
   jsLint.configs.recommended, // eslint:recommended
   ...tsLint.configs.recommended, // plugin:@typescript-eslint/recommended
-  eslintPluginGithub.getFlatConfigs().recommended, // plugin:github/recommended
+  {
+    ...githubRecommended,
+    plugins: githubPlugins
+  },
   eslintPluginJest.configs['flat/recommended'], // plugin:jest/recommended
   ...eslintPluginJsonc.configs['flat/recommended-with-jsonc'],
   eslintPluginPrettierRecommended,
@@ -30,7 +39,7 @@ export default [
       sourceType: 'module',
       parser: tsLint.parser, // @typescript-eslint/parser
       parserOptions: {
-        project: ['./.github/linters/tsconfig.json']
+        project: ['./.github/linters/tsconfig.json', './tsconfig.json']
       },
       globals: {
         ...globals.node,
@@ -43,15 +52,18 @@ export default [
   {
     files: ['__tests__/**/*'],
     rules: {
-      'import/no-namespace': 'off'
+      'import/no-namespace': 'off',
+      '@typescript-eslint/no-explicit-any': 'off',
+      'no-unused-vars': 'off',
+      '@typescript-eslint/no-unused-vars': 'off'
     }
   },
   {
     rules: {
-      'importPlugin/no-unresolved': 'off',
+      'import/no-unresolved': 'off',
       camelcase: 'off',
       'i18n-text/no-en': 'off',
-      'importPlugin/no-namespace': 'off',
+      'import/no-namespace': 'off',
       'no-console': 'warn',
       'eslint-comments/no-use': 'off'
     }
