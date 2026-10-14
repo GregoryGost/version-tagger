@@ -6,3 +6,8 @@ pnpm-lock.yaml
 
 .codex/
 .agent/
+
+# Vendored agent-projects-tools materials and project profile
+.agents/
+AGENTS.md
+CODEX_PROJECT.md
