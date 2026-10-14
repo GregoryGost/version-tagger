@@ -92,7 +92,7 @@ class Main {
         return;
       }
       // else push tag in repo and output
-      await this._github.pushNewTag(newTag, this._config.githubSha, this._config.githubHeadRef);
+      await this._github.pushNewTag(newTag, this._config.githubSha);
       info(`Pushed new tag "${newTag}" is OK. Work done`);
       setOutput('newtag', newTag);
       // eslint-disable-next-line @typescript-eslint/no-explicit-any

@@ -259,7 +259,6 @@ describe('github.ts', () => {
   it('github push new tag', async () => {
     const newTag = 'v3.0.0-rc.5';
     const githubSha = 'c3d0be41ecbe669545ee3e94d31ed9a4bc91ee3c';
-    const githubHeadRef = 'test-1';
     //
     const baseCommit: CommitDataT = {
       url: '',
@@ -429,7 +428,7 @@ describe('github.ts', () => {
     });
     const githubTest: Github = new Github(mockToken);
     expect(githubTest.message).toBe('');
-    await githubTest.pushNewTag(newTag, githubSha, githubHeadRef);
+    await githubTest.pushNewTag(newTag, githubSha);
     expect(setFailedMock).not.toHaveBeenCalled();
     expect(githubTest.message).toBe(
       `\n1) [TestLogin1]: Message for commit 1\nSHA: 12345\n\n2) []: Message for commit 2\nSHA: 67890\n`
@@ -444,10 +443,9 @@ describe('github.ts', () => {
   it('github push new tag negative', async () => {
     const newTag = 'v5.0.0-rc.5';
     const githubSha = 'r3d0be41ecbe669545ee3e94d31ed9a4bc91ee3c';
-    const githubHeadRef = 'test-2';
     const githubTest: Github = new Github(mockToken);
     expect(githubTest.message).toBe('');
-    await expect(githubTest.pushNewTag(newTag, githubSha, githubHeadRef)).rejects.toThrow(/Failed to push tag/);
+    await expect(githubTest.pushNewTag(newTag, githubSha)).rejects.toThrow(/Failed to push tag/);
     expect(setFailedMock).not.toHaveBeenCalled();
     expect(warningMock).toHaveBeenNthCalledWith(
       1,

@@ -106,9 +106,8 @@ class Github {
    * * DOC: https://docs.github.com/en/rest/git/refs?apiVersion=2022-11-28#create-a-reference
    * @param {string} new_tag - New version tag
    * @param {string} github_sha - Github commit SHA that triggered the workflow
-   * @param {string} github_head_ref - Github head ref or source branch of the pull request in a workflow run
    */
-  async pushNewTag(new_tag: string, github_sha: string, _github_head_ref: string): Promise<void> {
+  async pushNewTag(new_tag: string, github_sha: string): Promise<void> {
     try {
       // Get message
       const message: string = await this.getMessage(new_tag, github_sha);
