@@ -127,4 +127,3 @@ jobs:
           git add -- dist/index.js
           git commit -m 'chore: regenerate Dependabot dist [dependabot skip]'
           git push origin "HEAD:refs/heads/$PR_BRANCH"
-
