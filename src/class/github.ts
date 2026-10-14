@@ -1,4 +1,5 @@
-import { setFailed, warning, info } from '@actions/core';
+import { warning, info } from '@actions/core';
+import { valid, lt, rcompare } from 'semver';
 import { context, getOctokit } from '@actions/github';
 //
 import type {
@@ -73,25 +74,30 @@ class Github {
    * @returns @returns {string[]} Tags `array`
    */
   async getTags(): Promise<string[]> {
+    const tags: string[] = [];
+
     try {
-      const repoTags: TagResponseT = await this._client.rest.repos.listTags({
-        owner: this.owner,
-        repo: this.repo,
-        per_page: 100
-      });
-      const tags: string[] = repoTags.data.map((tagData: TagDataT) => {
-        return tagData.name;
-      });
-      if (tags.length > 0) {
-        this._tags = tags;
-        info(`Tags received ${JSON.stringify(this._tags)}`);
-      } else info('Tags not received from github repo');
-      return this._tags;
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    } catch (error: any) {
-      setFailed(error.message);
-      return [];
+      for (let page = 1; ; page++) {
+        const response: TagResponseT = await this._client.rest.repos.listTags({
+          owner: this.owner,
+          repo: this.repo,
+          per_page: 100,
+          page
+        });
+
+        tags.push(...response.data.map((tagData: TagDataT) => tagData.name));
+        if (response.data.length < 100) break;
+      }
+    } catch (error: unknown) {
+      const message = error instanceof Error ? error.message : String(error);
+      throw new Error(`Failed to list repository tags: ${message}`);
     }
+
+    this._tags = tags;
+    if (tags.length > 0) info(`Tags received ${JSON.stringify(tags)}`);
+    else info('Tags not received from github repo');
+
+    return [...tags];
   }
 
   /**
@@ -102,10 +108,10 @@ class Github {
    * @param {string} github_sha - Github commit SHA that triggered the workflow
    * @param {string} github_head_ref - Github head ref or source branch of the pull request in a workflow run
    */
-  async pushNewTag(new_tag: string, github_sha: string, github_head_ref: string): Promise<void> {
+  async pushNewTag(new_tag: string, github_sha: string, _github_head_ref: string): Promise<void> {
     try {
       // Get message
-      const message: string = await this.getMessage(new_tag, github_head_ref);
+      const message: string = await this.getMessage(new_tag, github_sha);
       // Create tag
       const createTag: CreateTagResponseT = await this._client.rest.git.createTag({
         owner: this.owner,
@@ -125,8 +131,9 @@ class Github {
       });
       info(`Create reference for tag: ${reference.data.ref} (${reference.data.url})`);
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    } catch (error: any) {
-      setFailed(error.message);
+    } catch (error: unknown) {
+      const message = error instanceof Error ? error.message : String(error);
+      throw new Error(`Failed to push tag "${new_tag}": ${message}`);
     }
   }
 
@@ -135,13 +142,17 @@ class Github {
    * * DOC: https://docs.github.com/en/rest/commits/commits?apiVersion=2022-11-28#compare-two-commits
    * @returns {string} Builded message or stub
    */
-  private async getMessage(new_tag: string, github_head_ref: string): Promise<string> {
+  private async getMessage(new_tag: string, github_sha: string): Promise<string> {
     try {
+
+      const previousTag = this._tags
+        .filter(tag => valid(tag) !== null && (valid(new_tag) === null || lt(tag, new_tag)))
+        .sort(rcompare)[0] ?? '';
       const changelog: CompareCommitsResponseT = await this._client.rest.repos.compareCommits({
         owner: this.owner,
         repo: this.repo,
-        base: this._tags.shift() ?? '',
-        head: github_head_ref
+        base: previousTag,
+        head: github_sha
       });
       const message: string = changelog.data.commits
         .map((commit_data: CommitDataT, index: number) => {
