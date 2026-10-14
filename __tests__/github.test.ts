@@ -197,13 +197,60 @@ describe('github.ts', () => {
     expect(tagFromFunc.includes('2.2.0')).toBe(true);
     expect(setFailedMock).not.toHaveBeenCalled();
   });
+  it('reads all tag pages before selecting a version', async () => {
+    const requestedPages: number[] = [];
+    const firstPage: TagDataT[] = Array.from({ length: 100 }, (_, index) => ({
+      name: `v1.0.0-dev.${index + 1}`,
+      commit: { sha: '', url: '' },
+      zipball_url: '',
+      tarball_url: '',
+      node_id: ''
+    }));
+
+    getOctokitMock.mockImplementation(() => ({
+      rest: {
+        repos: {
+          listTags: async ({ page }: { page: number }): Promise<TagResponseT> => {
+            requestedPages.push(page);
+            const tagArray =
+              page === 1
+                ? firstPage
+                : [
+                    {
+                      name: 'v1.0.0-dev.101',
+                      commit: { sha: '', url: '' },
+                      zipball_url: '',
+                      tarball_url: '',
+                      node_id: ''
+                    }
+                  ];
+            return {
+              headers: { date: String(Date.now()) },
+              status: 200,
+              url: '',
+              data: tagArray
+            };
+          }
+        }
+      }
+    }));
+
+    const githubTest = new Github(mockToken);
+    const tags = await githubTest.getTags();
+
+    expect(requestedPages).toEqual([1, 2]);
+    expect(tags).toHaveLength(101);
+    expect(tags).toContain('v1.0.0-dev.101');
+    expect(githubTest.tags).toHaveLength(101);
+  });
+
   /**
    * Get tag array is failed test
    */
   it('github tags failed', async () => {
     const githubTest: Github = new Github(mockToken);
-    await githubTest.getTags();
-    expect(setFailedMock).toHaveBeenNthCalledWith(1, `Cannot read properties of undefined (reading 'rest')`);
+    await expect(githubTest.getTags()).rejects.toThrow(/Failed to list repository tags/);
+    expect(setFailedMock).not.toHaveBeenCalled();
     expect(githubTest.tags.length).toBe(0);
   });
   /**
@@ -212,7 +259,6 @@ describe('github.ts', () => {
   it('github push new tag', async () => {
     const newTag = 'v3.0.0-rc.5';
     const githubSha = 'c3d0be41ecbe669545ee3e94d31ed9a4bc91ee3c';
-    const githubHeadRef = 'test-1';
     //
     const baseCommit: CommitDataT = {
       url: '',
@@ -382,7 +428,7 @@ describe('github.ts', () => {
     });
     const githubTest: Github = new Github(mockToken);
     expect(githubTest.message).toBe('');
-    await githubTest.pushNewTag(newTag, githubSha, githubHeadRef);
+    await githubTest.pushNewTag(newTag, githubSha);
     expect(setFailedMock).not.toHaveBeenCalled();
     expect(githubTest.message).toBe(
       `\n1) [TestLogin1]: Message for commit 1\nSHA: 12345\n\n2) []: Message for commit 2\nSHA: 67890\n`
@@ -397,11 +443,10 @@ describe('github.ts', () => {
   it('github push new tag negative', async () => {
     const newTag = 'v5.0.0-rc.5';
     const githubSha = 'r3d0be41ecbe669545ee3e94d31ed9a4bc91ee3c';
-    const githubHeadRef = 'test-2';
     const githubTest: Github = new Github(mockToken);
     expect(githubTest.message).toBe('');
-    await githubTest.pushNewTag(newTag, githubSha, githubHeadRef);
-    expect(setFailedMock).toHaveBeenNthCalledWith(1, `Cannot read properties of undefined (reading 'rest')`);
+    await expect(githubTest.pushNewTag(newTag, githubSha)).rejects.toThrow(/Failed to push tag/);
+    expect(setFailedMock).not.toHaveBeenCalled();
     expect(warningMock).toHaveBeenNthCalledWith(
       1,
       `Error get message from compare commits "Cannot read properties of undefined (reading 'rest')". Return stub message.`

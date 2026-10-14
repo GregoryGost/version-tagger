@@ -68,7 +68,7 @@ describe('tag.ts', () => {
     // Default identifier = 1
     // 1. version != last tag
     let tag: Tag = new Tag('2.0.0', 'v2.6.3-dev.1', 'v', 'dev');
-    expect(tag.buildNewTag()).toBe('v2.0.0-dev.1');
+    expect(() => tag.buildNewTag()).toThrow(/older than an existing release line/);
     // 2. version = last tag
     tag = new Tag('2.6.3', 'v2.6.3-dev.1', 'v', 'dev');
     expect(tag.buildNewTag()).toBe('v2.6.3-dev.2');
@@ -123,28 +123,50 @@ describe('tag.ts', () => {
     // !!! Not used when using postfix !!!
     // patch
     let tag: Tag = new Tag('v2.0.1-dev+build789', undefined, 'v', 'dev', undefined, undefined, 'patch', true);
-    expect(tag.buildNewTag()).toBe('v2.0.2-dev.1'); // CORRECT. Prerelease to prerelease and UP version
+    expect(tag.buildNewTag()).toBe('v2.0.1-dev.1'); // Promote and then reuse the matching prerelease line
     tag = new Tag('v2.0.2', undefined, 'v', 'dev', undefined, undefined, 'patch', true);
-    expect(tag.buildNewTag()).toBe('v2.0.4-dev.1'); // INCORRECT !!!
+    expect(tag.buildNewTag()).toBe('v2.0.3-dev.1'); // Exactly one patch increment
     tag = new Tag('v2.0.2', undefined, 'v', undefined, undefined, undefined, 'patch', true);
-    expect(tag.buildNewTag()).toBe('v2.0.4'); // INCORRECT !!!
+    expect(tag.buildNewTag()).toBe('v2.0.3'); // Exactly one patch increment
     tag = new Tag('v2.0.2-dev.1', undefined, 'v', undefined, undefined, undefined, 'patch', true);
-    expect(tag.buildNewTag()).toBe('v2.0.3'); // CORRECT. Prerelease to release and UP version
+    expect(tag.buildNewTag()).toBe('v2.0.2'); // Promote existing patch prerelease to stable
     // minor
     tag = new Tag('v2.0.2-dev.1', undefined, 'v', 'dev', undefined, undefined, 'minor', true);
-    expect(tag.buildNewTag()).toBe('v2.1.1-dev.1'); // WARNING !!! And up patch
+    expect(tag.buildNewTag()).toBe('v2.1.0-dev.1'); // No additional patch increment
     // major
     tag = new Tag('v2.0.2-dev.1', undefined, 'v', 'dev', undefined, undefined, 'major', true);
-    expect(tag.buildNewTag()).toBe('v3.0.1-dev.1'); // WARNING !!! And up patch
+    expect(tag.buildNewTag()).toBe('v3.0.0-dev.1'); // No additional patch increment
   });
+  it('selects the largest prerelease identifier across unordered tags', () => {
+    const tags = ['v1.1.0', 'v1.2.0-dev.2', 'v1.2.0-rc.25', 'v1.2.0-dev.10', 'v1.2.0-dev.3', 'not-a-semver'];
+    expect(new Tag('1.2.0', tags, 'v', 'dev').buildNewTag()).toBe('v1.2.0-dev.11');
+    expect(new Tag('1.2.0', [...tags].reverse(), 'v', 'dev').buildNewTag()).toBe('v1.2.0-dev.11');
+  });
+
+  it('starts the 1.2.0 prerelease series separately from 1.1.0 tags', () => {
+    const tags = ['v1.1.0', 'v1.1.0-dev.1', 'v1.1.0-dev.55'];
+    expect(new Tag('1.2.0', tags, 'v', 'dev').buildNewTag()).toBe('v1.2.0-dev.1');
+    expect(new Tag('1.2.0', [...tags, 'v1.2.0-dev.1'], 'v', 'dev').buildNewTag()).toBe('v1.2.0-dev.2');
+  });
+
+  it('rejects prereleases after a stable release of the same or newer version', () => {
+    expect(() => new Tag('1.2.0', ['v1.2.0'], 'v', 'dev').buildNewTag()).toThrow(/already released/);
+    expect(() => new Tag('1.2.0', ['v1.2.1-dev.1'], 'v', 'dev').buildNewTag()).toThrow(/older/);
+  });
+
+  it('does not mix release channels or prefixes', () => {
+    const tags = ['v1.2.0-rc.12', 'r1.2.0-dev.9', 'v1.2.0-dev.2'];
+    expect(new Tag('1.2.0', tags, 'v', 'dev').buildNewTag()).toBe('v1.2.0-dev.3');
+    expect(new Tag('1.2.0', tags, 'v', 'rc').buildNewTag()).toBe('v1.2.0-rc.13');
+  });
+
   /**
    * Negative tests
    */
   it('negative build tag', async () => {
     // Clear tag
     const tag: Tag = new Tag('vA.0.2-dev.1', undefined, 'v', 'dev', undefined, undefined, 'major', true);
-    const newTag: string = tag.buildNewTag();
-    expect(setFailedMock).toHaveBeenNthCalledWith(1, 'Error clean version "vA.0.2-dev.1"');
-    expect(newTag).toBe('');
+    expect(() => tag.buildNewTag()).toThrow('Error clean version "vA.0.2-dev.1"');
+    expect(setFailedMock).not.toHaveBeenCalled();
   });
 });

@@ -21,7 +21,7 @@ jobs:
     steps:
       - name: Checkout
         id: checkout
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
         with:
           fetch-depth: 0
 
@@ -33,7 +33,7 @@ jobs:
 
       - name: Setup Node.js
         id: setup-node
-        uses: actions/setup-node@v6
+        uses: actions/setup-node@v7
         with:
           node-version-file: package.json
           cache: pnpm
@@ -62,7 +62,7 @@ jobs:
           VALIDATE_GITHUB_ACTIONS_ZIZMOR: false
           VALIDATE_JAVASCRIPT_ES: false
           # for eslint 9 (flat config)
-          TYPESCRIPT_ES_CONFIG_FILE: eslint.config.mjs
+          TYPESCRIPT_ES_CONFIG_FILE: eslint.config.ts
           # if error - OK exit
           DISABLE_ERRORS: true
           LOG_LEVEL: INFO
