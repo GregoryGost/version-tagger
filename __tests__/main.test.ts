@@ -206,6 +206,34 @@ describe('main.ts', () => {
     expect(setOutputMock).not.toHaveBeenCalled();
   });
 
+  it('main run blocks dev tags after the stable version is released', async () => {
+    getInputMock.mockImplementation((name: string): string => {
+      switch (name) {
+        case 'token':
+          return mockToken;
+        case 'version':
+          return '1.2.0';
+        case 'prefix':
+          return 'v';
+        case 'postfix':
+          return 'dev';
+        default:
+          return '';
+      }
+    });
+    getBooleanInputMock.mockReturnValue(false);
+
+    const mainTest = new Main(defaultRootDir);
+    jest.spyOn(mainTest.github, 'getTags').mockResolvedValue(['v1.2.0', 'v1.2.0-dev.1', 'v1.1.0']);
+    const pushTag = jest.spyOn(mainTest.github, 'pushNewTag').mockResolvedValue();
+
+    await mainTest.run();
+
+    expect(setFailedMock).toHaveBeenCalledWith('Version 1.2.0 is already released; update the base version first');
+    expect(pushTag).not.toHaveBeenCalled();
+    expect(setOutputMock).not.toHaveBeenCalled();
+  });
+
   it('main run stops when the tag API fails', async () => {
     const mainTest = new Main(defaultRootDir);
     jest.spyOn(mainTest.github, 'getTags').mockRejectedValue(new Error('API unavailable'));
