@@ -1,10 +1,9 @@
 import { createHmac } from 'node:crypto';
-import { inc, clean, parse } from 'semver';
-import { setFailed, info } from '@actions/core';
+import { inc, clean, parse, compare } from 'semver';
+import { info } from '@actions/core';
 //
 import type { SemVer } from 'semver';
 import type { ReleaseTypeT } from '../types';
-import type { IdentifierBase } from 'semver/functions/inc';
 
 /**
  * Tagger class
@@ -15,14 +14,14 @@ class Tag {
    * Input source version.
    * From Githab Action Input, or `package.json` file
    * ---
-   * If the version is obtained from the package.json file and postfix is used, then the last tag must be used.
-   * Because only the last tag contains the last postfix index.
+   * The base version comes from explicit input or package.json; repository tags
+   * are examined to find the next prerelease identifier.
    */
   private readonly version: string;
   /**
-   * Last tag from Git repo
+   * Known tags from Git repo (the GitHub API order is not trusted)
    */
-  private readonly lastTag: string | null;
+  private readonly previousTags: readonly string[];
   /**
    * Custom Prefix for version. Example: `v`
    */
@@ -31,12 +30,6 @@ class Tag {
    * Custom Postfix for version. Example: `beta`, `rc`
    */
   private readonly postfix: string | null;
-  /**
-   * Start identifier for postfix up
-   * Example: `0` => `v1.0.0-beta.0` | `1` => `v1.0.0-beta.1`
-   * Default: `1`
-   */
-  private readonly startPostfixIdentifier: IdentifierBase;
   /**
    * Postfix No Upgrade version flag.
    * Default: `false`
@@ -63,19 +56,10 @@ class Tag {
    * Default: `false`
    */
   private readonly auto: boolean;
-  /**
-   * Utility Regexp for get version release type.
-   * major, minor, patch
-   */
-  private readonly versionRegExp: RegExp = /(\d+)\.(\d+)\.(\d+)/;
-  /**
-   * Frieze postfix patch version for "pre" workaround
-   */
-  private postfixPatchFrieze: string | null;
 
   constructor(
     version: string,
-    last_tag?: string | null,
+    last_tag?: string | readonly string[] | null,
     prefix?: string | null,
     postfix?: string | null,
     postfix_no_up?: boolean,
@@ -84,7 +68,7 @@ class Tag {
     auto?: boolean
   ) {
     this.version = version;
-    this.lastTag = last_tag ?? null;
+    this.previousTags = typeof last_tag === 'string' ? [last_tag] : (last_tag ?? []);
     this.prefix = prefix ?? null;
     this.postfix = postfix ?? null;
     this.postfixNoUp = postfix_no_up ?? false;
@@ -92,8 +76,6 @@ class Tag {
     this.releaseType = release_type ?? null;
     this.auto = auto ?? false;
     //
-    this.startPostfixIdentifier = '1';
-    this.postfixPatchFrieze = null;
   }
 
   /**
@@ -115,71 +97,77 @@ class Tag {
    * @returns {string} Updated version or not changed version
    */
   private upVersion(): string {
-    try {
-      //
-      // Clear version. Prefix remove
-      const version: string | null = clean(this.version);
-      info(`Now version: ${version}`);
-      if (version === null) throw new Error(`Error clean version "${this.version}"`);
-      //
-      // Get patch version for frieze
-      if (this.postfix !== null && this.postfix !== '' && this.releaseType === null) {
-        const versionMatch: RegExpMatchArray | null = version.match(this.versionRegExp);
-        if (versionMatch !== null) this.postfixPatchFrieze = String(versionMatch[3]);
-      }
-      //
-      // Update version
-      // If version prerelease change to release version
-      // Example: 3.0.0-dev.1 => 3.0.0
-      if (this.releaseType !== null && this.releaseType !== '') {
-        const updatedVersion: string | null = inc(version, this.releaseType);
-        if (updatedVersion !== null) {
-          //
-          // If necessary, in addition to conversion, upgrade the version
-          // Example minor: 3.0.0-dev.1 => 3.0.0 => 3.1.0
-          // !!! Not used when using postfix !!!
-          if (this.auto && this.postfix === null) {
-            const upVersion: string | null = inc(updatedVersion, this.releaseType);
-            if (upVersion !== null) {
-              return upVersion;
-            }
-          }
-          return updatedVersion;
-        }
-      }
-      return version;
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    } catch (error: any) {
-      setFailed(error.message);
-      return '';
+    const version = clean(this.version);
+    if (version === null) throw new Error(`Error clean version "${this.version}"`);
+    info(`Now version: ${version}`);
+
+    if (this.auto && this.releaseType === null)
+      throw new Error('auto requires releasetype to choose a SemVer increment');
+
+    if (this.releaseType !== null && this.releaseType !== '') {
+      const updatedVersion = inc(version, this.releaseType);
+      if (updatedVersion === null) throw new Error(`Cannot increment version "${version}"`);
+      return updatedVersion;
     }
+
+    return version;
   }
 
   /**
-   * Up Version postfix number.
-   * Start identifier = `1`.
-   * Example: `v1.0.0-rc.3` => `v1.0.0-rc.4` | `v1.0.0` => `v1.0.0-rc.1`
-   * !!!NOTE!!! The "pre" operation is not available for use in typescript.
-   * There is no basic option NOT to upgrade the patch version.
-   * A workaround needs to be applied.
-   * @param {string} version - Base version
-   * @returns {string} Version with updated postfix
+   * Generate the next prerelease for a given base version and channel.
+   * The highest numeric identifier is selected from all repository tags,
+   * independent of the order returned by GitHub.
    */
   private upPostfix(version: string): string {
-    // If postfix enabled
-    if (this.postfix !== null && this.postfix !== '') {
-      // If las tag exists postfix, change version. Get postfix from last tag
-      version = this.setPostfixForBaseVersion(version);
-      // next
-      const identifier: false | IdentifierBase | undefined = this.postfixNoUp ? false : this.startPostfixIdentifier;
-      const versionUpPostfix: string | null = inc(version, 'prerelease', this.postfix, identifier);
-      if (versionUpPostfix === null) return version;
-      // bring back the patch version
-      if (this.postfixPatchFrieze !== null)
-        return versionUpPostfix.replace(this.versionRegExp, `$1.$2.${this.postfixPatchFrieze}`);
-      return versionUpPostfix;
+    if (this.postfix === null || this.postfix === '') return version;
+    if (!/^[0-9A-Za-z-]+$/.test(this.postfix)) throw new Error(`Invalid prerelease identifier "${this.postfix}"`);
+
+    const parsedVersion = parse(version);
+    if (parsedVersion === null) throw new Error(`Invalid SemVer "${version}"`);
+    const baseVersion = `${parsedVersion.major}.${parsedVersion.minor}.${parsedVersion.patch}`;
+    const prefix = this.prefix ?? '';
+    const parsedTags: SemVer[] = [];
+
+    for (const name of this.previousTags) {
+      if (prefix !== '' && !name.startsWith(prefix)) continue;
+      const parsedTag = parse(prefix !== '' ? name.slice(prefix.length) : name);
+      if (parsedTag !== null) parsedTags.push(parsedTag);
     }
-    return version;
+
+    for (const tag of parsedTags) {
+      const taggedVersion = `${tag.major}.${tag.minor}.${tag.patch}`;
+      if (compare(taggedVersion, baseVersion) > 0)
+        throw new Error(`Requested version ${baseVersion} is older than an existing release line ${tag.version}`);
+      if (taggedVersion === baseVersion && tag.prerelease.length === 0)
+        throw new Error(`Version ${baseVersion} is already released; update the base version first`);
+    }
+
+    if (this.postfixNoUp) return `${baseVersion}-${this.postfix}`;
+
+    let latestIdentifier = 0;
+    const sourceVersion = parse(this.version);
+    const candidates =
+      sourceVersion === null ? [...parsedTags, parsedVersion] : [...parsedTags, parsedVersion, sourceVersion];
+
+    for (const candidate of candidates) {
+      const candidateVersion = `${candidate.major}.${candidate.minor}.${candidate.patch}`;
+      if (candidateVersion !== baseVersion || candidate.prerelease[0] !== this.postfix) continue;
+
+      if (candidate.prerelease.length === 1) continue;
+      if (
+        candidate.prerelease.length !== 2 ||
+        typeof candidate.prerelease[1] !== 'number' ||
+        !Number.isSafeInteger(candidate.prerelease[1])
+      )
+        throw new Error(`Unsupported prerelease format "${candidate.version}"`);
+
+      latestIdentifier = Math.max(latestIdentifier, candidate.prerelease[1]);
+    }
+
+    if (!Number.isSafeInteger(latestIdentifier + 1))
+      throw new Error(`Prerelease counter overflow for ${baseVersion}-${this.postfix}`);
+
+    return `${baseVersion}-${this.postfix}.${latestIdentifier + 1}`;
   }
 
   /**
@@ -198,38 +186,6 @@ class Tag {
       return `+${this.metadata}`;
     }
     return '';
-  }
-
-  /**
-   * Set postfix for base version
-   * @param {string} version Raw version (from package.json - example 2.0.0)
-   * @returns {string} postfixed version if set postfix and last tag is exists
-   */
-  private setPostfixForBaseVersion(version: string): string {
-    // If las tag exists postfix, change version. Get postfix from last tag
-    if (this.lastTag !== null && this.lastTag !== '') {
-      const parseVersion: SemVer | null = parse(version);
-      const parseLastTag: SemVer | null = parse(this.lastTag);
-      if (parseLastTag !== null && parseVersion !== null) {
-        if (
-          parseVersion.major === parseLastTag.major &&
-          parseVersion.minor === parseLastTag.minor &&
-          parseVersion.patch === parseLastTag.patch
-        ) {
-          // Parse version prerelease
-          // [] - if example v2.0.0
-          // ['dev'] - if example v2.0.0-dev
-          // ['dev', 1] - if example v2.0.0-dev.1
-          if (parseLastTag.prerelease.length > 0 && parseLastTag.prerelease[0] !== undefined) {
-            version += `-${parseLastTag.prerelease[0]}`;
-          }
-          if (parseLastTag.prerelease.length > 0 && parseLastTag.prerelease[1] !== undefined) {
-            version += `.${parseLastTag.prerelease[1]}`;
-          }
-        }
-      }
-    }
-    return version;
   }
 }
 
