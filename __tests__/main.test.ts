@@ -178,9 +178,7 @@ describe('main.ts', () => {
 
     await mainTest.run();
 
-    expect(setFailedMock).toHaveBeenCalledWith(
-      'Tag "v1.2.0-dev.11" would be older than existing tag "v1.2.0-rc.1"'
-    );
+    expect(setFailedMock).toHaveBeenCalledWith('Tag "v1.2.0-dev.11" would be older than existing tag "v1.2.0-rc.1"');
     expect(setOutputMock).not.toHaveBeenCalled();
   });
 
