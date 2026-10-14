@@ -64,6 +64,8 @@ jobs:
         uses: ./
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
+          # Keep this dry run above released versions without changing package.json.
+          version: '${{ github.run_number }}.0.0'
           prefix: 'v'
           postfix: 'testaction'
           postfixnoup: true
