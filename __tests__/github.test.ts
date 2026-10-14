@@ -212,15 +212,18 @@ describe('github.ts', () => {
         repos: {
           listTags: async ({ page }: { page: number }): Promise<TagResponseT> => {
             requestedPages.push(page);
-            const tagArray = page === 1 ? firstPage : [
-              {
-                name: 'v1.0.0-dev.101',
-                commit: { sha: '', url: '' },
-                zipball_url: '',
-                tarball_url: '',
-                node_id: ''
-              }
-            ];
+            const tagArray =
+              page === 1
+                ? firstPage
+                : [
+                    {
+                      name: 'v1.0.0-dev.101',
+                      commit: { sha: '', url: '' },
+                      zipball_url: '',
+                      tarball_url: '',
+                      node_id: ''
+                    }
+                  ];
             return {
               headers: { date: String(Date.now()) },
               status: 200,

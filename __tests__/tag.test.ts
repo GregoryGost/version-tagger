@@ -138,14 +138,7 @@ describe('tag.ts', () => {
     expect(tag.buildNewTag()).toBe('v3.0.0-dev.1'); // No additional patch increment
   });
   it('selects the largest prerelease identifier across unordered tags', () => {
-    const tags = [
-      'v1.1.0',
-      'v1.2.0-dev.2',
-      'v1.2.0-rc.25',
-      'v1.2.0-dev.10',
-      'v1.2.0-dev.3',
-      'not-a-semver'
-    ];
+    const tags = ['v1.1.0', 'v1.2.0-dev.2', 'v1.2.0-rc.25', 'v1.2.0-dev.10', 'v1.2.0-dev.3', 'not-a-semver'];
     expect(new Tag('1.2.0', tags, 'v', 'dev').buildNewTag()).toBe('v1.2.0-dev.11');
     expect(new Tag('1.2.0', [...tags].reverse(), 'v', 'dev').buildNewTag()).toBe('v1.2.0-dev.11');
   });

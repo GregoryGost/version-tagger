@@ -120,8 +120,7 @@ class Tag {
    */
   private upPostfix(version: string): string {
     if (this.postfix === null || this.postfix === '') return version;
-    if (!/^[0-9A-Za-z-]+$/.test(this.postfix))
-      throw new Error(`Invalid prerelease identifier "${this.postfix}"`);
+    if (!/^[0-9A-Za-z-]+$/.test(this.postfix)) throw new Error(`Invalid prerelease identifier "${this.postfix}"`);
 
     const parsedVersion = parse(version);
     if (parsedVersion === null) throw new Error(`Invalid SemVer "${version}"`);
@@ -147,7 +146,8 @@ class Tag {
 
     let latestIdentifier = 0;
     const sourceVersion = parse(this.version);
-    const candidates = sourceVersion === null ? [...parsedTags, parsedVersion] : [...parsedTags, parsedVersion, sourceVersion];
+    const candidates =
+      sourceVersion === null ? [...parsedTags, parsedVersion] : [...parsedTags, parsedVersion, sourceVersion];
 
     for (const candidate of candidates) {
       const candidateVersion = `${candidate.major}.${candidate.minor}.${candidate.patch}`;
@@ -187,8 +187,6 @@ class Tag {
     }
     return '';
   }
-
-
 }
 
 export { Tag };

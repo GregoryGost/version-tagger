@@ -146,13 +146,9 @@ describe('main.ts', () => {
     getBooleanInputMock.mockImplementation((name: string): boolean => name === 'dryrun');
 
     const mainTest = new Main(defaultRootDir);
-    jest.spyOn(mainTest.github, 'getTags').mockResolvedValue([
-      'v1.1.0',
-      'v1.2.0-dev.2',
-      'v1.2.0-rc.1',
-      'v1.2.0-dev.10',
-      'v1.2.0-dev.3'
-    ]);
+    jest
+      .spyOn(mainTest.github, 'getTags')
+      .mockResolvedValue(['v1.1.0', 'v1.2.0-dev.2', 'v1.2.0-rc.1', 'v1.2.0-dev.10', 'v1.2.0-dev.3']);
 
     await mainTest.run();
 

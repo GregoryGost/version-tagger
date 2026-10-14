@@ -144,10 +144,10 @@ class Github {
    */
   private async getMessage(new_tag: string, github_sha: string): Promise<string> {
     try {
-
-      const previousTag = this._tags
-        .filter(tag => valid(tag) !== null && (valid(new_tag) === null || lt(tag, new_tag)))
-        .sort(rcompare)[0] ?? '';
+      const previousTag =
+        this._tags
+          .filter(tag => valid(tag) !== null && (valid(new_tag) === null || lt(tag, new_tag)))
+          .sort(rcompare)[0] ?? '';
       const changelog: CompareCommitsResponseT = await this._client.rest.repos.compareCommits({
         owner: this.owner,
         repo: this.repo,
