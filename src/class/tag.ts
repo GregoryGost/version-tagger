@@ -146,7 +146,8 @@ class Tag {
     if (this.postfixNoUp) return `${baseVersion}-${this.postfix}`;
 
     let latestIdentifier = 0;
-    const candidates = [...parsedTags, parsedVersion];
+    const sourceVersion = parse(this.version);
+    const candidates = sourceVersion === null ? [...parsedTags, parsedVersion] : [...parsedTags, parsedVersion, sourceVersion];
 
     for (const candidate of candidates) {
       const candidateVersion = `${candidate.major}.${candidate.minor}.${candidate.patch}`;
