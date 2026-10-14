@@ -148,12 +148,40 @@ describe('main.ts', () => {
     const mainTest = new Main(defaultRootDir);
     jest
       .spyOn(mainTest.github, 'getTags')
-      .mockResolvedValue(['v1.1.0', 'v1.2.0-dev.2', 'v1.2.0-rc.1', 'v1.2.0-dev.10', 'v1.2.0-dev.3']);
+      .mockResolvedValue(['v1.1.0', 'v1.2.0-dev.2', 'v1.2.0-dev.10', 'v1.2.0-dev.3']);
 
     await mainTest.run();
 
     expect(setOutputMock).toHaveBeenCalledWith('newtag', 'v1.2.0-dev.11');
     expect(setFailedMock).not.toHaveBeenCalled();
+  });
+
+  it('main run rejects a dev tag that would precede a release candidate', async () => {
+    getInputMock.mockImplementation((name: string): string => {
+      switch (name) {
+        case 'token':
+          return mockToken;
+        case 'version':
+          return '1.2.0';
+        case 'prefix':
+          return 'v';
+        case 'postfix':
+          return 'dev';
+        default:
+          return '';
+      }
+    });
+    getBooleanInputMock.mockImplementation((name: string): boolean => name === 'dryrun');
+
+    const mainTest = new Main(defaultRootDir);
+    jest.spyOn(mainTest.github, 'getTags').mockResolvedValue(['v1.2.0-rc.1', 'v1.2.0-dev.10']);
+
+    await mainTest.run();
+
+    expect(setFailedMock).toHaveBeenCalledWith(
+      'Tag "v1.2.0-dev.11" would be older than existing tag "v1.2.0-rc.1"'
+    );
+    expect(setOutputMock).not.toHaveBeenCalled();
   });
 
   it('main run rejects a tag that has already been released', async () => {
@@ -1273,7 +1301,7 @@ describe('main.ts', () => {
     jest.spyOn(mainTest.github, 'pushNewTag').mockImplementation();
     // Run
     await mainTest.run();
-    expect(setFailedMock).toHaveBeenNthCalledWith(1, 'Tag "v2.6.3-dev" is already exists in repository!!!');
+    expect(setFailedMock).toHaveBeenNthCalledWith(1, 'Tag "v2.6.3-dev" already exists with the same semantic version');
   });
   it('6. Example: Prerelease or Release version from package.json + metadata', async () => {
     const lastTagVersions: string[] = [];
