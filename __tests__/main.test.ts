@@ -128,74 +128,72 @@ describe('main.ts', () => {
   /**
    * Main run function work
    */
-  it('main run tag is already exists', async () => {
-    getBooleanInputMock.mockImplementation((name: string): boolean => {
-      switch (name) {
-        case 'postfixnoup':
-          return mockPostfixnoup;
-        case 'auto':
-          return true;
-        case 'dryrun':
-          return mockDryrun;
-        default:
-          return false;
-      }
-    });
-    // Tag is already exists
-    const mainTest: Main = new Main(defaultRootDir);
-    jest.spyOn(mainTest.github, 'getTags').mockImplementation(async (): Promise<string[]> => {
-      return ['v1.0.0-rc.1', 'v1.0.0-rc.2'];
-    });
-    // jest.spyOn(mainTest.tag, 'buildNewTag').mockImplementation((): string => {
-    //   return 'v1.0.0-rc.1';
-    // });
-    await mainTest.run();
-    expect(setFailedMock).toHaveBeenNthCalledWith(1, `Tag "v1.0.0-rc.2" is already exists in repository!!!`);
-    //
-    //
+  it('main run increments a dev prerelease even when GitHub returns a stable tag first', async () => {
     getInputMock.mockImplementation((name: string): string => {
       switch (name) {
         case 'token':
           return mockToken;
+        case 'version':
+          return '1.2.0';
         case 'prefix':
           return 'v';
         case 'postfix':
           return 'dev';
-        case 'version':
-        case 'metadata':
-        case 'releasetype':
         default:
           return '';
       }
     });
-    getBooleanInputMock.mockImplementation((name: string): boolean => {
+    getBooleanInputMock.mockImplementation((name: string): boolean => name === 'dryrun');
+
+    const mainTest = new Main(defaultRootDir);
+    jest.spyOn(mainTest.github, 'getTags').mockResolvedValue([
+      'v1.1.0',
+      'v1.2.0-dev.2',
+      'v1.2.0-rc.1',
+      'v1.2.0-dev.10',
+      'v1.2.0-dev.3'
+    ]);
+
+    await mainTest.run();
+
+    expect(setOutputMock).toHaveBeenCalledWith('newtag', 'v1.2.0-dev.11');
+    expect(setFailedMock).not.toHaveBeenCalled();
+  });
+
+  it('main run rejects a tag that has already been released', async () => {
+    getInputMock.mockImplementation((name: string): string => {
       switch (name) {
-        case 'postfixnoup':
-        case 'auto':
-        case 'dryrun':
+        case 'token':
+          return mockToken;
+        case 'version':
+          return '1.2.0';
+        case 'prefix':
+          return 'v';
         default:
-          return false;
+          return '';
       }
     });
-    const mainTest_2: Main = new Main(defaultRootDir);
-    jest.spyOn(mainTest_2.github, 'getTags').mockImplementation(async (): Promise<string[]> => {
-      return [
-        'v1.0.0',
-        'v1.0.0-dev.11',
-        'v1.0.0-dev.10',
-        'v1.0.0-dev.9',
-        'v1.0.0-dev.8',
-        'v1.0.0-dev.7',
-        'v1.0.0-dev.6',
-        'v1.0.0-dev.5',
-        'v1.0.0-dev.4',
-        'v1.0.0-dev.2',
-        'v1.0.0-dev.1'
-      ];
-    });
-    await mainTest_2.run();
-    expect(setFailedMock).toHaveBeenNthCalledWith(2, `Tag "v1.0.0-dev.1" is already exists in repository!!!`);
+    getBooleanInputMock.mockImplementation((name: string): boolean => name === 'dryrun');
+
+    const mainTest = new Main(defaultRootDir);
+    jest.spyOn(mainTest.github, 'getTags').mockResolvedValue(['v1.1.0', 'v1.2.0']);
+
+    await mainTest.run();
+
+    expect(setFailedMock).toHaveBeenCalledWith('Tag "v1.2.0" already exists with the same semantic version');
+    expect(setOutputMock).not.toHaveBeenCalled();
   });
+
+  it('main run stops when the tag API fails', async () => {
+    const mainTest = new Main(defaultRootDir);
+    jest.spyOn(mainTest.github, 'getTags').mockRejectedValue(new Error('API unavailable'));
+
+    await mainTest.run();
+
+    expect(setFailedMock).toHaveBeenCalledWith('API unavailable');
+    expect(setOutputMock).not.toHaveBeenCalled();
+  });
+
   it('main run ok. dryrun = true', async () => {
     let mainTest: Main = new Main(defaultRootDir);
     // No legacy tags
