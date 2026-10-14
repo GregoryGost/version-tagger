@@ -15,6 +15,7 @@ on:
     paths:
       - package.json
       - pnpm-lock.yaml
+      - .github/workflows/update-dependabot-dist.yml
 
 permissions:
   contents: read
@@ -128,3 +129,21 @@ jobs:
           git add -- dist/index.js
           git commit -m 'chore: regenerate Dependabot dist [dependabot skip]'
           git push origin "HEAD:refs/heads/$PR_BRANCH"
+
+  format-preview:
+    if: github.actor != 'dependabot[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: pnpm/action-setup@v4
+        with:
+          version: ^10
+      - uses: actions/setup-node@v7
+        with:
+          node-version-file: package.json
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - name: Show Prettier changes
+        run: |
+          pnpm prettier --write .github/workflows/update-dependabot-dist.yml
+          git diff -- .github/workflows/update-dependabot-dist.yml
