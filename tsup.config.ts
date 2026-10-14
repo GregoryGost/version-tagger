@@ -5,6 +5,8 @@ export default defineConfig({
   entry: ['src/index.ts'],
   target: 'esnext',
   format: ['cjs'],
+  // A GitHub Action runs the checked-in dist/index.js without node_modules.
+  noExternal: ['@actions/core', '@actions/github', 'semver'],
   minify: true,
   treeshake: true,
   clean: true,

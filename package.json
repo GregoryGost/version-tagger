@@ -47,8 +47,6 @@
     "check-lib": "pnpm outdated"
   },
   "devDependencies": {
-    "@actions/core": "3.0.1",
-    "@actions/github": "9.1.1",
     "@eslint/js": "9.39.5",
     "@jest/globals": "30.5.2",
     "@octokit/core": "7.0.8",
@@ -72,11 +70,15 @@
     "make-coverage-badge": "1.2.0",
     "prettier": "3.9.10",
     "prettier-eslint": "17.1.2",
-    "semver": "7.8.5",
     "ts-jest": "29.4.14",
     "tsup": "8.5.1",
     "type-fest": "5.10.0",
     "typescript": "6.0.3",
     "typescript-eslint": "8.71.1"
+  },
+  "dependencies": {
+    "@actions/core": "3.0.1",
+    "@actions/github": "9.1.1",
+    "semver": "7.8.5"
   }
 }
