@@ -42,10 +42,10 @@ Configure permission:
 | **dryrun**      | `false`  | If this value is true, the tag will not be pushed. Use for test this action                                                                                                                                                                                                                                                                                                               | `false` |
 
 Since `v1.2.0`, `uselasttag` selects the highest matching SemVer tag across all repository tag pages, regardless of
-GitHub API order. With `postfix`, the next numeric prerelease identifier comes from the largest existing number for
-the same base version, prefix and channel. New tags are checked for duplicates and SemVer regressions, and prereleases
-are rejected once a stable release exists for the same base version. After releasing `vX.Y.Z`, move `package.json`
-to the next planned version before creating more prereleases.
+GitHub API order. With `postfix`, the next numeric prerelease identifier comes from the largest existing number for the
+same base version, prefix and channel. New tags are checked for duplicates and SemVer regressions, and prereleases are
+rejected once a stable release exists for the same base version. After releasing `vX.Y.Z`, move `package.json` to the
+next planned version before creating more prereleases.
 
 ### Outputs
 
@@ -157,8 +157,8 @@ Gets the version `4.0.0` from the `package.json` file.
 - Result: `v4.0.0-dev.1`
 - Next result: `v4.0.0-dev.2`, `v4.0.0-dev.3`, etc.
 
-The counter is based on the highest matching `dev` identifier across all tags, not the order returned by GitHub.
-After `v4.0.0` is released, the action rejects further `v4.0.0-dev.*` tags; bump `package.json` first.
+The counter is based on the highest matching `dev` identifier across all tags, not the order returned by GitHub. After
+`v4.0.0` is released, the action rejects further `v4.0.0-dev.*` tags; bump `package.json` first.
 
 ```yml
 - name: Create tag
