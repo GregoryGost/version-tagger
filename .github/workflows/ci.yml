@@ -23,20 +23,29 @@ jobs:
 
       - name: Install pnpm
         id: setup-pnpm
-        uses: pnpm/action-setup@v4
+        uses: pnpm/action-setup@v6
         with:
-          version: ^10
+          version: 12.15.0
 
       - name: Setup Node.js
         id: setup-node
         uses: actions/setup-node@v7
         with:
-          node-version-file: package.json
+          node-version: '24'
+          check-latest: true
           cache: pnpm
 
       - name: Install Dependencies
         id: pnpm-install
         run: pnpm i --frozen-lockfile
+
+      # A two-document lockfile can cause GitHub Dependency Graph to miss dependencies.
+      - name: Check Dependency Graph Lockfile Compatibility
+        run: |
+          if grep -Eq '^---[[:space:]]*$' pnpm-lock.yaml; then
+            echo 'Multi-document pnpm lockfiles are not yet supported by GitHub Dependency Graph' >&2
+            exit 1
+          fi
 
       - name: Check Format
         id: pnpm-format-check
@@ -45,6 +54,11 @@ jobs:
       - name: Lint
         id: pnpm-lint
         run: pnpm run lint
+
+      - name: TypeScript Typecheck
+        run: |
+          pnpm exec tsc --noEmit -p tsconfig.json
+          pnpm exec tsc --noEmit -p tsconfig.jest.json
 
       - name: Tests
         id: pnpm-ci-test
