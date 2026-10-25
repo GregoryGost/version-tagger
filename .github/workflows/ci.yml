@@ -23,9 +23,9 @@ jobs:
 
       - name: Install pnpm
         id: setup-pnpm
-        uses: pnpm/action-setup@v4
+        uses: pnpm/action-setup@v6
         with:
-          version: ^10
+          version: 12.15.0
 
       - name: Setup Node.js
         id: setup-node
@@ -37,6 +37,14 @@ jobs:
       - name: Install Dependencies
         id: pnpm-install
         run: pnpm i --frozen-lockfile
+
+      # A two-document lockfile can cause GitHub Dependency Graph to miss dependencies.
+      - name: Check Dependency Graph Lockfile Compatibility
+        run: |
+          if grep -Eq '^---[[:space:]]*$' pnpm-lock.yaml; then
+            echo 'Multi-document pnpm lockfiles are not yet supported by GitHub Dependency Graph' >&2
+            exit 1
+          fi
 
       - name: Check Format
         id: pnpm-format-check

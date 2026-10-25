@@ -52,7 +52,7 @@ Legacy `.codex/AGENTS.md` and legacy rules are not activation signals for this p
 
 - Node.js runtime for GitHub Action: Node 24, declared in `action.yml`.
 - Package Node.js support, TypeScript and pnpm version sources: `package.json`, `pnpm-lock.yaml`, and CI.
-- Package manager: pnpm 10; install reproducibly with `--frozen-lockfile`.
+- Package manager: pnpm 12.15.0; install reproducibly with `--frozen-lockfile`.
 - Source: `src/`, ES imports; `tsup` creates one CommonJS bundle.
 - Entry point for consumers: checked-in `dist/index.js`, independent of installed `node_modules`.
 - Node.js configuration: `tsconfig.json`; Jest configuration: `tsconfig.jest.json`.
@@ -88,6 +88,7 @@ Commands are sourced from `package.json`. Use only project-declared scripts and 
 ## Dependencies And Repository Policy
 
 - The dependency source of truth is `package.json` and `pnpm-lock.yaml`.
+- Keep `pnpm-lock.yaml` in its single-document format for GitHub Dependency Graph compatibility.
 - New dependencies require explicit user approval.
 - Runtime modules must remain bundled into `dist/index.js`.
 - Changes go through a dedicated branch and pull request targeting `develop`; never push directly to `develop`.

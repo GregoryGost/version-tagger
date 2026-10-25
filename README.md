@@ -242,10 +242,11 @@ Gets the version `7.0.0` from the `package.json` file.
 - Using pnpm modules manager
 - Using unit tests
 
-Install pnpm
+Install pnpm 12.15.0 (with Node.js 24) and dependencies:
 
 ```sh
-npm add -g pnpm
+npm install -g pnpm@12.15.0
+pnpm install --frozen-lockfile
 ```
 
 ## Licensing
