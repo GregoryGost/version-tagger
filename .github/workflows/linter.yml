@@ -63,6 +63,6 @@ jobs:
           VALIDATE_JAVASCRIPT_ES: false
           # for eslint 9 (flat config)
           TYPESCRIPT_ES_CONFIG_FILE: eslint.config.ts
-          # if error - OK exit
-          DISABLE_ERRORS: true
+          # Treat Super-Linter findings as CI failures.
+          DISABLE_ERRORS: false
           LOG_LEVEL: INFO
