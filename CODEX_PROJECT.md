@@ -67,7 +67,7 @@ Legacy `.codex/AGENTS.md` and legacy rules are not activation signals for this p
 
 ## ESLint And Prettier Profiles
 
-- ESLint flat config: `eslint.config.ts`; preserve existing TypeScript and Jest lint rules.
+- ESLint flat config: `eslint.config.ts`; preserve existing TypeScript and Jest linter rules.
 - Prettier config: `.prettierrc` and `.prettierignore`.
 - Treat copied agent template files as vendored material: do not rewrite upstream text during source formatting.
 
