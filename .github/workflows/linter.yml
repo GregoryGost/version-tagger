@@ -65,4 +65,7 @@ jobs:
           TYPESCRIPT_ES_CONFIG_FILE: eslint.config.ts
           # Treat Super-Linter findings as CI failures.
           DISABLE_ERRORS: false
+          # Report findings in the job summary without requiring PR comment permissions.
+          ENABLE_GITHUB_PULL_REQUEST_SUMMARY_COMMENT: false
+          ENABLE_GITHUB_ACTIONS_STEP_SUMMARY: true
           LOG_LEVEL: INFO
