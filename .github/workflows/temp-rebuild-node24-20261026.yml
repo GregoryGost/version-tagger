@@ -1,0 +1,52 @@
+# Temporary PR-only build helper; remove after dist/index.js is updated.
+name: Rebuild Node 24 dist for PR
+
+on:
+  push:
+    branches:
+      - test/jest-thresholds-node24-target-20261026
+    paths:
+      - tsup.config.ts
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    if: github.repository == 'GregoryGost/version-tagger' && github.ref == 'refs/heads/test/jest-thresholds-node24-target-20261026'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+        with:
+          persist-credentials: true
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v6
+        with:
+          version: 12.15.0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v7
+        with:
+          node-version: '24'
+          check-latest: true
+          cache: pnpm
+
+      - name: Install Dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Rebuild checked-in Action bundle
+        run: pnpm run package
+
+      - name: Commit updated bundle when needed
+        run: |
+          if git diff --quiet -- dist/index.js; then
+            echo 'Bundle unchanged for node24 target'
+            exit 0
+          fi
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add -- dist/index.js
+          git commit -m 'build: regenerate node24 target bundle'
+          git push origin HEAD:refs/heads/test/jest-thresholds-node24-target-20261026
