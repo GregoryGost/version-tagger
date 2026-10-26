@@ -1,0 +1,8 @@
+# actionlint's bundled metadata for create-github-app-token@v3 is outdated.
+# https://github.com/rhysd/actionlint/issues/669
+# The action officially supports client-id. Suppress only these two false positives.
+paths:
+  .github/workflows/update-dependabot-dist.yml:
+    ignore:
+      - 'missing input "app-id" which is required by action "actions/create-github-app-token@'
+      - 'input "client-id" is not defined in action "actions/create-github-app-token@'

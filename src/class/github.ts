@@ -62,7 +62,7 @@ class Github {
 
   /**
    * Get special message for new version tag
-   * @returns {string} Builded message or stub
+   * @returns {string} Built message or stub
    */
   get message(): string {
     return this._message;
@@ -139,7 +139,7 @@ class Github {
   /**
    * Get special message for new version tag
    * * DOC: https://docs.github.com/en/rest/commits/commits?apiVersion=2022-11-28#compare-two-commits
-   * @returns {string} Builded message or stub
+   * @returns {string} Built message or stub
    */
   private async getMessage(new_tag: string, github_sha: string): Promise<string> {
     try {

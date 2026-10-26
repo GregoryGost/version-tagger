@@ -48,9 +48,13 @@ jobs:
         uses: super-linter/super-linter/slim@v8
         env:
           DEFAULT_BRANCH: develop
-          FILTER_REGEX_EXCLUDE: (dist|__tests__)
+          # Scope per-file linters away from vendored rules and generated metadata.
+          # Trivy still checks the full repository, including pnpm-lock.yaml.
+          FILTER_REGEX_EXCLUDE: '(^|/)(dist|__tests__|\.agents|\.codex)/|(^|/)AGENTS\.md$|(^|/)pnpm-lock\.yaml$|(^|/)assets/tag_logic\.drawio$'
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           CHECKOV_FILE_NAME: .checkov.yml
+          # Limit actionlint's known stale GitHub App token schema exception to one workflow.
+          GITHUB_ACTIONS_CONFIG_FILE: .github/actionlint.yaml
           LINTER_RULES_PATH: .
           # migration from 7.4.0 to 8
           # https://github.com/super-linter/super-linter/blob/d5b0a2ab116623730dd094f15ddc1b6b25bf7b99/docs/upgrade-guide.md?plain=1#L42
@@ -64,6 +68,9 @@ jobs:
           VALIDATE_JAVASCRIPT_ES: false
           # for eslint 9 (flat config)
           TYPESCRIPT_ES_CONFIG_FILE: eslint.config.ts
-          # if error - OK exit
-          DISABLE_ERRORS: true
+          # Treat Super-Linter findings as CI failures.
+          DISABLE_ERRORS: false
+          # Report findings in the job summary without requiring PR comment permissions.
+          ENABLE_GITHUB_PULL_REQUEST_SUMMARY_COMMENT: false
+          ENABLE_GITHUB_ACTIONS_STEP_SUMMARY: true
           LOG_LEVEL: INFO

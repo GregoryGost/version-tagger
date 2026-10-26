@@ -1,0 +1,4 @@
+# Imported agent instructions and the bootstrap file are maintained upstream.
+.agents/
+.codex/
+AGENTS.md

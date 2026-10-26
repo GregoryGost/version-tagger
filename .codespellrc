@@ -1,0 +1,3 @@
+# Ignore generated metadata and encoded diagram content; scan project source normally.
+[codespell]
+skip = pnpm-lock.yaml,assets/tag_logic.drawio

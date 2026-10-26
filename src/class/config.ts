@@ -230,7 +230,7 @@ class Config {
 
   /**
    * Get commit SHA that triggered the workflow.
-   * @returns {string} Github SHA. Exampe: `ffac537e6cbbf934b08745a378932722df287a53`
+   * @returns {string} Github SHA. Example: `ffac537e6cbbf934b08745a378932722df287a53`
    */
   get githubSha(): string {
     return this._githubSha;
