@@ -50,7 +50,7 @@ next planned version before creating more prereleases.
 
 | name       | description                                                         |
 | ---------- | ------------------------------------------------------------------- |
-| **newtag** | The generated version tag, such as `v1.2.0` or `v1.3.0-dev.2`. |
+| **newtag** | The generated version tag, such as `v1.2.0` or `v1.3.0-dev.2`.      |
 
 ## Usage
 
