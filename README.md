@@ -17,7 +17,8 @@ GitHub Action to automate tag-based version control. For both production and dev
 
 > [!IMPORTANT]
 >
-> This Action reads the version from an explicit `version` input, a `package.json` file, or the fallback `0.1.0`. When `uselasttag` is enabled, it may use the highest matching SemVer tag instead.
+> This Action reads the version from an explicit `version` input, a `package.json` file, or the fallback `0.1.0`. When
+> `uselasttag` is enabled, it may use the highest matching SemVer tag instead.
 
 ## Config options
 
@@ -48,9 +49,9 @@ next planned version before creating more prereleases.
 
 ### Outputs
 
-| name       | description                                                         |
-| ---------- | ------------------------------------------------------------------- |
-| **newtag** | The generated version tag, such as `v1.2.0` or `v1.3.0-dev.2`.      |
+| name       | description                                                    |
+| ---------- | -------------------------------------------------------------- |
+| **newtag** | The generated version tag, such as `v1.2.0` or `v1.3.0-dev.2`. |
 
 ## Usage
 
