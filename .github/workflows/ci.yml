@@ -60,6 +60,9 @@ jobs:
           pnpm exec tsc --noEmit -p tsconfig.json
           pnpm exec tsc --noEmit -p tsconfig.jest.json
 
+      - name: Test v1 major-version alias safety
+        run: bash script/test-sync-major-tag
+
       - name: Tests
         id: pnpm-ci-test
         run: pnpm run ci-test
