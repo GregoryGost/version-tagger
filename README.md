@@ -17,8 +17,7 @@ GitHub Action to automate tag-based version control. For both production and dev
 
 > [!IMPORTANT]
 >
-> The this version only works with projects containing a `package.json` or workflow file that passes the version to the
-> input
+> This Action reads the version from an explicit `version` input, a `package.json` file, or the fallback `0.1.0`. When `uselasttag` is enabled, it may use the highest matching SemVer tag instead.
 
 ## Config options
 
@@ -51,7 +50,7 @@ next planned version before creating more prereleases.
 
 | name       | description                                                         |
 | ---------- | ------------------------------------------------------------------- |
-| **newtag** | The GitHub Token to use for reference management in the repository. |
+| **newtag** | The generated version tag, such as `v1.2.0` or `v1.3.0-dev.2`. |
 
 ## Usage
 
@@ -85,7 +84,7 @@ jobs:
 
       - name: Create tag
         id: create-tag
-        uses: GregoryGost/version-tagger@v1.1.0
+        uses: GregoryGost/version-tagger@v1.2.0
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           prefix: 'v'
@@ -102,7 +101,7 @@ Gets the version `1.0.0` from the `package.json` file.
 ```yml
 - name: Create tag
   id: create-tag
-  uses: GregoryGost/version-tagger@v1.1.0
+  uses: GregoryGost/version-tagger@v1.2.0
   with:
     token: ${{ secrets.GITHUB_TOKEN }}
     prefix: 'v'
@@ -120,7 +119,7 @@ Gets the version `2.0.0` from the previous step workflow
 
 - name: Create tag
   id: create-tag
-  uses: GregoryGost/version-tagger@v1.1.0
+  uses: GregoryGost/version-tagger@v1.2.0
   with:
     token: ${{ secrets.GITHUB_TOKEN }}
     version: ${{ steps.previous-step-id.outputs.version }}
@@ -198,7 +197,7 @@ Gets the version `6.0.0` from the `package.json` file.
 ```yml
 - name: Create tag
   id: create-tag
-  uses: GregoryGost/version-tagger@v1.1.0
+  uses: GregoryGost/version-tagger@v1.2.0
   with:
     token: ${{ secrets.GITHUB_TOKEN }}
     prefix: 'v'
@@ -210,7 +209,7 @@ Gets the version `6.0.0` from the `package.json` file.
 ```yml
 - name: Create tag
   id: create-tag
-  uses: GregoryGost/version-tagger@v1.1.0
+  uses: GregoryGost/version-tagger@v1.2.0
   with:
     token: ${{ secrets.GITHUB_TOKEN }}
     prefix: 'v'
@@ -226,7 +225,7 @@ Gets the version `7.0.0` from the `package.json` file.
 ```yml
 - name: Create tag
   id: create-tag
-  uses: GregoryGost/version-tagger@v1.1.0
+  uses: GregoryGost/version-tagger@v1.2.0
   with:
     token: ${{ secrets.GITHUB_TOKEN }}
     prefix: 'v'
