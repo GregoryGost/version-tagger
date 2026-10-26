@@ -1,0 +1,60 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+fixture_dir="$(mktemp -d)"
+trap 'rm -rf "$fixture_dir"' EXIT
+
+git init --bare -q "$fixture_dir/remote.git"
+git init -q -b main "$fixture_dir/repo"
+git -C "$fixture_dir/repo" config user.name 'CI Test'
+git -C "$fixture_dir/repo" config user.email 'ci@example.test'
+git -C "$fixture_dir/repo" remote add origin "$fixture_dir/remote.git"
+
+git -C "$fixture_dir/repo" commit -q --allow-empty -m 'stable 1.2'
+git -C "$fixture_dir/repo" tag -a v1.2.0 -m 'v1.2.0 release'
+git -C "$fixture_dir/repo" push -q origin main refs/tags/v1.2.0
+(
+  cd "$fixture_dir/repo"
+  bash "$script_dir/sync-major-tag" v1.2.0
+)
+old_sha="$(git -C "$fixture_dir/repo" rev-parse HEAD)"
+alias_sha="$(git -C "$fixture_dir/repo" ls-remote origin refs/tags/v1 | awk '{print $1}')"
+[[ "$alias_sha" == "$old_sha" ]] || { echo 'Initial alias incorrect' >&2; exit 1; }
+
+git -C "$fixture_dir/repo" commit -q --allow-empty -m 'release candidate'
+git -C "$fixture_dir/repo" tag v1.3.0-rc.1
+git -C "$fixture_dir/repo" push -q origin main refs/tags/v1.3.0-rc.1
+(
+  cd "$fixture_dir/repo"
+  bash "$script_dir/sync-major-tag" v1.3.0-rc.1
+)
+alias_sha="$(git -C "$fixture_dir/repo" ls-remote origin refs/tags/v1 | awk '{print $1}')"
+[[ "$alias_sha" == "$old_sha" ]] || { echo 'Prerelease moved alias' >&2; exit 1; }
+
+git -C "$fixture_dir/repo" commit -q --allow-empty -m 'stable 1.3'
+git -C "$fixture_dir/repo" tag -a v1.3.0 -m 'v1.3.0 release'
+git -C "$fixture_dir/repo" push -q origin main refs/tags/v1.3.0
+(
+  cd "$fixture_dir/repo"
+  bash "$script_dir/sync-major-tag" v1.3.0
+  bash "$script_dir/sync-major-tag" v1.2.0
+  bash "$script_dir/sync-major-tag" v1.3.0
+)
+new_sha="$(git -C "$fixture_dir/repo" rev-parse HEAD)"
+alias_sha="$(git -C "$fixture_dir/repo" ls-remote origin refs/tags/v1 | awk '{print $1}')"
+[[ "$alias_sha" == "$new_sha" ]] || { echo 'Alias regressed or mismatched' >&2; exit 1; }
+
+git -C "$fixture_dir/repo" commit -q --allow-empty -m 'unreleased commit'
+git -C "$fixture_dir/repo" tag v1.4.0
+git -C "$fixture_dir/repo" push -q origin refs/tags/v1.4.0
+(
+  cd "$fixture_dir/repo"
+  if bash "$script_dir/sync-major-tag" v1.4.0; then
+    echo 'Off-main release was accepted' >&2
+    exit 1
+  fi
+)
+alias_sha="$(git -C "$fixture_dir/repo" ls-remote origin refs/tags/v1 | awk '{print $1}')"
+[[ "$alias_sha" == "$new_sha" ]] || { echo 'Off-main release changed alias' >&2; exit 1; }
+echo 'Major-version alias tests passed'
