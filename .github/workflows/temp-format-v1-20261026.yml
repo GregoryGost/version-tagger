@@ -1,0 +1,53 @@
+# Temporary branch-only formatter; remove after formatting the PR changes.
+name: Format PR maintenance files
+
+on:
+  push:
+    branches:
+      - feat/major-v1-alias-20261026
+    paths:
+      - .github/workflows/temp-format-v1-20261026.yml
+
+permissions:
+  contents: write
+
+jobs:
+  format:
+    if: github.repository == 'GregoryGost/version-tagger' && github.ref == 'refs/heads/feat/major-v1-alias-20261026'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v6
+        with:
+          version: 12.15.0
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v7
+        with:
+          node-version: '24'
+          check-latest: true
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Format README
+        run: pnpm exec prettier --write README.md
+
+      - name: Format Bash scripts
+        run: go run mvdan.cc/sh/v3/cmd/shfmt@v3.12.0 -w script/sync-major-tag script/test-sync-major-tag
+
+      - name: Commit formatted files
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add -- README.md script/sync-major-tag script/test-sync-major-tag
+          if git diff --cached --quiet; then
+            echo 'Already formatted'
+            exit 0
+          fi
+          git commit -m 'style: format v1 alias documentation and Bash helpers'
+          git push origin HEAD:refs/heads/feat/major-v1-alias-20261026
