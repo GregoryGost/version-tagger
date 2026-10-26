@@ -20,6 +20,8 @@ jobs:
       - name: Checkout step
         id: checkout
         uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
 
       - name: New Version step
         id: new-version
@@ -27,3 +29,8 @@ jobs:
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           prefix: 'v'
+
+      - name: Update v1 alias for stable releases
+        env:
+          RELEASE_TAG: ${{ steps.new-version.outputs.newtag }}
+        run: bash script/sync-major-tag "$RELEASE_TAG"

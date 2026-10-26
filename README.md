@@ -237,6 +237,20 @@ Gets the version `7.0.0` from the `package.json` file.
   run: echo "${{ steps.create-tag.outputs.newtag }}"
 ```
 
+## Major-version alias
+
+Stable releases in the v1 series support the moving `v1` tag. After the
+`main` self-versioning workflow creates a stable `v1.x.y` tag, the release
+alias advances to that commit. Prereleases (for example `v1.3.0-dev.1`),
+older stable versions and release commits outside `main` cannot move the
+alias. The standalone `script/release` command uses the same guard.
+
+Consumers can choose the latest compatible stable v1 release with
+`uses: GregoryGost/version-tagger@v1` or pin an exact tag such as
+`@v1.2.0` for reproducibility. Merging this PR into `develop` does
+not publish or update Git tags; the alias is created by an eligible stable
+release after the change reaches `main`.
+
 ## Contrib
 
 - Using pnpm modules manager
