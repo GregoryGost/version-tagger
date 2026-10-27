@@ -11,20 +11,19 @@ inputs:
     description: 'The GitHub Token to use for reference management in the repo'
     required: true
   version:
-    description: 'Version from previous action output. Pattern semver https://semver.org/: `x.y.z`'
+    description: 'Optional explicit SemVer version (`x.y.z`); otherwise read package.json or use 0.1.0'
     required: false
   uselasttag:
     description:
-      'Use latest available tag as source version. Applies the latest available tag received from the repository for the
-      source version. If there are no available tags, it takes the version from the base logic: `package.json` file or
-      default version `0.1.0`'
+      'Use the highest matching SemVer tag as the source version, regardless of GitHub API order. If there are no tags,
+      use the version input, package.json, or 0.1.0. If tags exist but none match, fail.'
     required: false
     default: false
   prefix:
     description: 'A prefix that will appear immediately before the tag version. Example: `v` => `v1.0.0`'
     required: false
   postfix:
-    description: 'Postfix that will appear immediately after the tag version. Example: `beta` => `v1.0.0-beta.0`'
+    description: 'Postfix that will appear immediately after the tag version. Example: `beta` => `v1.0.0-beta.1`'
     required: false
   postfixnoup:
     description:
@@ -34,7 +33,7 @@ inputs:
     default: false
   metadata:
     description:
-      'Add your own metadata, or use the sliced sha1 version hash.. Example: `build123` or `fyf2c5fr` =>
+      'Add custom build metadata, or derive a short SHA-1 hash. Example: `build123` or `fyf2c5fr` =>
       `v1.0.0-beta.1+fyf2c5fr`'
     required: false
   releasetype:
@@ -45,13 +44,12 @@ inputs:
     required: false
   auto:
     description:
-      'Forced version update. DANGEROUS-1!!! May be incorrect because in some cases duplicates the version upgrade.
-      DANGEROUS-2!!! The version in the file may not match what will be in the tags as a result. If `FALSE`, no
-      automatic promotions will be made.'
+      'When true, releasetype is required. A specified releasetype increments once regardless of auto; auto does not add
+      another increment.'
     required: false
     default: false
   dryrun:
-    description: 'If this value is true, the tag will not be pushed. Use for test this action'
+    description: 'When true, calculate and output the tag without pushing it to GitHub.'
     required: false
     default: false
 

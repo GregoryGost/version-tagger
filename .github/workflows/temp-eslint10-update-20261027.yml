@@ -1,0 +1,71 @@
+# Temporary branch-scoped dependency refresh; remove before merging.
+name: Refresh ESLint 10 dependencies
+
+on:
+  push:
+    branches:
+      - chore/eslint10-migration-20261026
+    paths:
+      - package.json
+      - eslint.config.ts
+
+permissions:
+  contents: write
+
+jobs:
+  refresh:
+    if: github.repository == 'GregoryGost/version-tagger'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout PR branch
+        uses: actions/checkout@v7
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v6
+        with:
+          version: 12.15.0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v7
+        with:
+          node-version: '24'
+          check-latest: true
+          cache: pnpm
+
+      - name: Re-resolve lockfile
+        run: pnpm install --lockfile-only --no-frozen-lockfile
+
+      - name: Verify frozen installation
+        run: pnpm install --frozen-lockfile
+
+      - name: Verify peer dependency compatibility
+        run: pnpm peers check
+
+      - name: Verify formatting
+        run: pnpm run format:check
+
+      - name: Verify ESLint 10
+        run: pnpm run lint
+
+      - name: Verify TypeScript
+        run: |
+          pnpm exec tsc --noEmit -p tsconfig.json
+          pnpm exec tsc --noEmit -p tsconfig.jest.json
+
+      - name: Verify Jest coverage
+        run: pnpm run ci-test
+
+      - name: Rebuild Action bundle
+        run: pnpm run package
+
+      - name: Commit generated files
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add -- pnpm-lock.yaml dist/index.js
+          if git diff --cached --quiet; then
+            echo 'Generated outputs unchanged'
+            exit 0
+          fi
+          git commit -m 'build: refresh ESLint 10 dependency lockfile and bundle'
+          git push origin HEAD:refs/heads/chore/eslint10-migration-20261026
