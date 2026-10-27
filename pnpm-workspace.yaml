@@ -3,5 +3,10 @@ allowBuilds:
   esbuild: true
   unrs-resolver: true
 
+# Prepare both the GitHub Actions glibc runner and Alpine Super-Linter.
+supportedArchitectures:
+  - current
+  - linux-x64-musl
+
 overrides:
   undici: 6.29.1
