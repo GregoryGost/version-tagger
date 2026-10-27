@@ -47,7 +47,7 @@
     "check-lib": "pnpm outdated"
   },
   "devDependencies": {
-    "@eslint/js": "9.39.5",
+    "@eslint/js": "10.0.1",
     "@jest/globals": "30.5.2",
     "@octokit/core": "7.0.8",
     "@octokit/plugin-rest-endpoint-methods": "18.0.0",
@@ -58,9 +58,9 @@
     "@types/semver": "7.8.0",
     "@typescript-eslint/eslint-plugin": "8.71.1",
     "@typescript-eslint/parser": "8.71.1",
-    "eslint": "9.39.2",
+    "eslint": "10.0.1",
     "eslint-config-prettier": "10.1.8",
-    "eslint-plugin-github": "6.1.2",
+    "eslint-plugin-import-x": "4.17.1",
     "eslint-plugin-jest": "29.16.11",
     "eslint-plugin-jsonc": "3.4.2",
     "eslint-plugin-prettier": "5.5.6",

@@ -90,7 +90,7 @@ class Github {
       }
     } catch (error: unknown) {
       const message = error instanceof Error ? error.message : String(error);
-      throw new Error(`Failed to list repository tags: ${message}`);
+      throw new Error(`Failed to list repository tags: ${message}`, { cause: error });
     }
 
     this._tags = tags;
@@ -132,7 +132,7 @@ class Github {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: unknown) {
       const message = error instanceof Error ? error.message : String(error);
-      throw new Error(`Failed to push tag "${new_tag}": ${message}`);
+      throw new Error(`Failed to push tag "${new_tag}": ${message}`, { cause: error });
     }
   }
 
