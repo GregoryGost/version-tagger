@@ -39,6 +39,9 @@ jobs:
         id: pnpm-install
         run: pnpm i --frozen-lockfile
 
+      - name: Check Peer Dependencies
+        run: pnpm peers check
+
       # A two-document lockfile can cause GitHub Dependency Graph to miss dependencies.
       - name: Check Dependency Graph Lockfile Compatibility
         run: |
