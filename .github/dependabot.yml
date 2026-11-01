@@ -29,6 +29,10 @@ updates:
       - dependencies
     reviewers:
       - GregoryGost
+    # The action targets Node 24, so do not adopt API types for newer Node releases.
+    ignore:
+      - dependency-name: '@types/node'
+        versions: ['>=25.0.0']
     groups:
       development:
         dependency-type: development
