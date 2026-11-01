@@ -34,8 +34,8 @@ importers:
         specifier: 18.0.0
         version: 18.0.0(@octokit/core@7.0.8)
       '@octokit/types':
-        specifier: 17.0.0
-        version: 17.0.0
+        specifier: 18.0.0
+        version: 18.0.0
       '@tsconfig/node24':
         specifier: 24.0.5
         version: 24.0.5
